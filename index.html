@@ -1,0 +1,610 @@
+<!-- V52: optionNote修正・Royal専用処理を削除・削除ボタン修正・料金ルール表示・2027祝日・HTMLエスケープ -->
+<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>エモパレDB｜V54</title>
+<!-- V46: 会場管理モーダルのボタン動作不具合を修正。不要な広告管理参照を削除 -->
+<!-- V38: 会場管理を整理し、「料金設定」を削除。「会場情報変更」を「会場を追加」の右側に配置 -->
+<!-- V35: 会場管理から既存会場を検索・選択して登録情報を編集・保存できるようにした版 -->
+<!-- V33: 広告サイトの色・コピー可否はURL自動判定ではなく、会場ごとに管理画面で手動指定 -->
+<style>
+*{box-sizing:border-box}body{margin:0;background:#f5f7fb;color:#18212f;font-family:-apple-system,BlinkMacSystemFont,"Noto Sans JP","Yu Gothic",sans-serif}
+header{background:#111827;color:#fff;padding:22px 24px}header h1{margin:0;font-size:22px}header p{margin:6px 0 0;color:#cbd5e1;font-size:13px}
+.wrap{max-width:1220px;margin:24px auto;padding:0 18px}.top{display:flex;gap:14px;align-items:end;flex-wrap:wrap;margin-bottom:18px}
+label{display:block;font-size:12px;font-weight:700;color:#6b7280;margin-bottom:6px}input,select{height:42px;border:1px solid #d1d5db;border-radius:9px;background:#fff;padding:0 12px;font:inherit;font-weight:600}
+.search{display:flex;gap:6px}.search input{width:300px}.search button,.copy{height:42px;border:0;border-radius:9px;background:#2563eb;color:#fff;padding:0 14px;font-weight:800;cursor:pointer}
+.grid{display:grid;grid-template-columns:1.45fr .9fr;gap:18px}.card{background:#fff;border:1px solid #e5e7eb;border-radius:14px;padding:18px;box-shadow:0 2px 10px #0f172a0a}
+.calhead{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}.calhead h2{margin:0;font-size:18px}.nav{display:flex;gap:8px}.nav button{width:52px;height:46px;font-size:30px;line-height:1;border:2px solid #d1d5db;border:1px solid #e5e7eb;background:#fff;border-radius:8px;cursor:pointer}
+.week,.days{display:grid;grid-template-columns:repeat(7,1fr);gap:5px}.week div{text-align:center;font-size:11px;font-weight:700;color:#6b7280;padding:6px}.week div:first-child{color:#dc2626}.week div:last-child{color:#2563eb}
+.day{min-height:82px;border:2px solid #e5e7eb;border-radius:9px;background:#fff;padding:8px;text-align:left;cursor:pointer}.day:hover{filter:brightness(.98)}.day.saturday{border-color:#2563eb;background:#eff6ff}.day.sunday,.day.holiday{border-color:#dc2626;background:#fef2f2}.day.selected{outline:3px solid #111827;outline-offset:2px;background:#fff7cc;position:relative;z-index:2}.day.selected:hover{filter:none}.muted{opacity:.35}.day.closed{background:#f3f4f6;color:#9ca3af}.day.closed .fee{color:#9ca3af}
+.num{font-size:12px;font-weight:800}.day.saturday .num,.day.sunday .num,.day.holiday .num{color:#111827}.fee{font-size:12px;font-weight:900;margin-top:13px}.holidayName{font-size:9px;color:#dc2626;margin-top:3px}
+.detail{position:sticky;top:18px}.detail h2{margin:0 0 4px;font-size:19px}.sub{font-size:13px;color:#6b7280;margin-bottom:16px}
+.floorTabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px}.floorTabs button{border:1px solid #d1d5db;background:#fff;border-radius:8px;padding:9px 12px;font-weight:800;cursor:pointer}.floorTabs button.active{background:#2563eb;color:#fff;border-color:#2563eb;box-shadow:0 0 0 3px #dbeafe;transform:translateY(-1px)}
+.info{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}.ibox{background:#f8fafc;border-radius:9px;padding:10px}.ibox small{color:#6b7280;font-size:10px}.ibox strong{display:block;margin-top:3px;font-size:14px}
+.time select{width:100%;height:48px;font-size:15px}.result{margin-top:16px;padding:16px;border:1px solid #e5e7eb;border-radius:12px;background:#fafafa}.cap{font-size:11px;color:#6b7280}.prices{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:5px}.pricebox{background:#fff;border-radius:9px;padding:10px}.pricebox small{display:block;color:#6b7280;font-size:10px}.price{font-size:23px;font-weight:900;margin-top:3px}
+.status{display:inline-block;border-radius:999px;padding:5px 11px;font-size:12px;font-weight:800;margin-top:10px}.ok{color:#15803d;background:#f0fdf4}.ng{color:#b91c1c;background:#fef2f2}
+.option{margin-top:16px;border-top:1px solid #e5e7eb;padding-top:14px}.option-row{display:flex;justify-content:space-between;gap:12px;padding:7px 0;font-size:13px}.option-row strong{white-space:nowrap}.note{font-size:11px;color:#6b7280;line-height:1.7;margin-top:12px}
+.links{margin-top:16px;border-top:1px solid #e5e7eb;padding-top:14px}.links h3{font-size:12px;margin:0 0 9px}.linkrow{display:flex;gap:7px;flex-wrap:wrap}.copy{height:38px;font-size:12px;box-shadow:0 1px 2px #0f172a14}.copy.ad-active{background:#16a34a;color:#fff}.copy.ad-active:hover{background:#15803d}.copy.ad-inactive{background:#d1d5db;color:#6b7280;cursor:default}.copy.ad-inactive:hover{filter:none}.copied{background:#15803d!important}
+@media(max-width:850px){.grid{grid-template-columns:1fr}.detail{position:static}.search input{width:230px}.day{min-height:70px}.fee{font-size:10px}}
+
+.top-page{max-width:980px;margin:0 auto;padding:42px 18px}.top-hero{text-align:center;margin-bottom:34px}.top-hero h2{margin:0;font-size:28px}.top-hero p{margin:9px 0 0;color:#64748b;font-size:13px}.venue-search-card{background:#fff;border:1px solid #e5e7eb;border-radius:16px;padding:22px;box-shadow:0 4px 18px #0f172a0a}.venue-search-row{display:flex;gap:8px}.venue-search-row input{flex:1;height:48px;font-size:15px}.venue-search-row button{height:48px;border:0;border-radius:9px;background:#2563eb;color:#fff;padding:0 22px;font-weight:800;cursor:pointer}.venue-results{margin-top:16px;display:grid;gap:10px}.venue-result{width:100%;text-align:left;background:#fff;border:1px solid #dbe3ee;border-radius:12px;padding:15px 16px;cursor:pointer}.venue-result:hover{border-color:#2563eb;background:#eff6ff}.venue-result strong{font-size:15px}.venue-result small{display:block;margin-top:4px;color:#64748b}.top-admin{display:flex;justify-content:flex-end;gap:8px;margin-bottom:14px}.top-admin button,.back-top{height:40px;border:1px solid #cbd5e1;border-radius:9px;background:#fff;padding:0 14px;font-weight:800;cursor:pointer;color:#334155}.back-top{margin-bottom:14px}.no-result{padding:14px;color:#64748b;font-size:13px;background:#f8fafc;border-radius:10px}
+</style>
+<style id="store-option-note-css">
+.store-option-note{
+  margin-top:4px;
+  padding:5px 9px;
+  color:#92400e;
+  background:#fff7d6;
+  border:1px solid #f3d27a;
+  border-radius:6px;
+  font-size:12px;
+  font-weight:700;
+}
+</style>
+
+
+<style id="note-fix">.note{white-space:pre-line}</style>
+<style id="weekday-calendar-final">
+.day.saturday{border-color:#2563eb !important;background:#eff6ff !important}
+.day.sunday,.day.holiday{border-color:#dc2626 !important;background:#fef2f2 !important}
+.day.saturday .num,.day.sunday .num,.day.holiday .num{color:#111827 !important}
+</style>
+
+
+<style id="reservation-admin-css">
+.admin-modal{display:none;position:fixed;inset:0;background:#0f172a99;z-index:1000;padding:24px;overflow:auto}.admin-modal.open{display:block}.admin-panel{max-width:1100px;margin:0 auto;background:#f8fafc;border-radius:16px;padding:20px;box-shadow:0 20px 60px #0f172a40}.admin-head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px}.admin-head h2{margin:0;font-size:20px}.admin-head p{margin:5px 0 0;color:#64748b;font-size:12px}.admin-close{width:40px;height:40px;border:0;border-radius:9px;background:#e5e7eb;font-size:25px;cursor:pointer}.admin-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}.admin-card{background:#fff;border:1px solid #e5e7eb;border-radius:12px;padding:16px}.admin-card h3{margin:0 0 7px;font-size:14px}.admin-help{font-size:11px;color:#64748b;margin:0 0 10px}.admin-card textarea{width:100%;min-height:250px;border:1px solid #cbd5e1;border-radius:9px;padding:11px;resize:vertical;font:13px/1.7 inherit}.admin-primary{margin-top:10px;height:42px;border:0;border-radius:9px;background:#2563eb;color:#fff;padding:0 15px;font-weight:800;cursor:pointer}.admin-primary:disabled{background:#cbd5e1;cursor:not-allowed}.admin-error{color:#b91c1c;font-size:12px;margin-top:8px}.admin-msg{color:#15803d;font-size:12px;margin-top:8px}.parsed-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px}.parsed-grid label{margin:0;font-size:10px;color:#64748b}.parsed-grid input{width:100%;margin-top:4px;height:40px;font-size:12px;background:#f8fafc}.reservations-card{margin-top:14px}.reservation-list-head{display:flex;justify-content:space-between;gap:10px;align-items:center}.reservation-list-head span{font-size:11px;color:#64748b}.reservation-item{display:grid;grid-template-columns:1.2fr .8fr 1fr auto;gap:10px;align-items:center;padding:10px 0;border-top:1px solid #e5e7eb;font-size:12px}.reservation-item strong{font-size:13px}.reservation-delete{height:32px;border:1px solid #fecaca;background:#fff1f2;color:#b91c1c;border-radius:7px;padding:0 10px;font-weight:700;cursor:pointer}.time-booked{color:#b91c1c!important;font-weight:900}.time-booked::after{content:" ×予約済み"}.time-unavailable{color:#9ca3af!important}.time-available{color:#15803d!important}@media(max-width:850px){.admin-grid{grid-template-columns:1fr}.reservation-item{grid-template-columns:1fr 1fr}.reservation-item button{grid-column:2}}
+</style>
+
+<style id="venue-add-css">
+.venue-add-form{display:grid;gap:14px}.form-section{background:#fff;border:1px solid #e5e7eb;border-radius:12px;padding:15px}.form-section h3{margin:0 0 10px;font-size:14px}.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.form-field{display:flex;flex-direction:column;gap:5px}.form-field.full{grid-column:1/-1}.form-field label{font-size:11px;font-weight:800;color:#475569}.form-field input,.form-field select,.form-field textarea{width:100%;box-sizing:border-box;border:1px solid #cbd5e1;border-radius:8px;padding:9px;font:13px/1.5 inherit;background:#fff}.form-field textarea{min-height:90px;resize:vertical}.floor-editor{display:grid;gap:8px}.floor-row{display:grid;grid-template-columns:1fr auto;gap:8px}.floor-row button{border:1px solid #fecaca;background:#fff1f2;color:#b91c1c;border-radius:8px;padding:0 11px;cursor:pointer}.floor-option-editor{display:grid;gap:14px}.floor-option-card{border:1px solid #dbe3ec;border-radius:10px;padding:14px;background:#f8fafc}.floor-option-title{font-size:14px;font-weight:800;margin-bottom:10px;color:#1e293b}.floor-option-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.form-actions{display:flex;justify-content:flex-end;gap:8px}.admin-secondary{height:42px;border:1px solid #cbd5e1;border-radius:9px;background:#fff;color:#334155;padding:0 15px;font-weight:800;cursor:pointer}.admin-success{height:42px;border:0;border-radius:9px;background:#15803d;color:#fff;padding:0 15px;font-weight:800;cursor:pointer}.venue-list-row{display:flex;justify-content:space-between;gap:10px;align-items:center;padding:9px 0;border-bottom:1px solid #eef2f7}.venue-list-row small{display:block;color:#64748b;font-weight:600}.venue-edit-note{font-size:11px;color:#64748b;margin-top:7px}@media(max-width:700px){.form-grid{grid-template-columns:1fr}.form-field.full{grid-column:auto}}
+.ad-manage-grid{display:grid;gap:10px}
+.ad-manage-row{display:grid;grid-template-columns:110px 150px 1fr;gap:8px;align-items:center}
+.ad-manage-row .ad-site-name{font-weight:800;font-size:12px;color:#334155}
+.ad-status-select{height:40px;border:1px solid #cbd5e1;border-radius:8px;padding:0 9px;font:700 12px inherit;background:#fff}
+.ad-url-input{height:40px!important}
+@media(max-width:700px){.ad-manage-row{grid-template-columns:1fr}.ad-manage-row .ad-status-select,.ad-manage-row .ad-url-input{width:100%}}
+
+</style>
+
+<style id="global-manage-css">
+.global-manage-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.global-manage-card{min-height:190px;display:flex;flex-direction:column}
+.global-manage-card .admin-primary{align-self:flex-start;margin-top:auto}
+.venue-manage-buttons{display:flex;align-items:center;gap:120px;margin-top:auto}
+.venue-manage-buttons .admin-primary{margin-top:0}
+.edit-venue-search{width:100%;height:44px!important;font-size:14px;margin-top:4px}
+.edit-venue-list{display:grid;gap:8px;margin-top:12px;max-height:430px;overflow:auto}
+.edit-venue-btn{width:100%;text-align:left;border:1px solid #dbe3ee;background:#fff;border-radius:10px;padding:12px 14px;cursor:pointer}
+.edit-venue-btn:hover{border-color:#2563eb;background:#eff6ff}
+.edit-venue-btn strong{display:block;font-size:14px;color:#18212f}
+.edit-venue-btn small{display:block;margin-top:4px;color:#64748b;font-size:11px}
+.edit-venue-empty{padding:12px;background:#f8fafc;border-radius:9px;color:#64748b;font-size:12px}
+@media(max-width:850px){.global-manage-grid{grid-template-columns:1fr}}
+
+.venue-delete-btn{height:42px;border:0;border-radius:9px;background:#dc2626;color:#fff;padding:0 15px;font-weight:800;cursor:pointer}.venue-delete-btn:hover{background:#b91c1c}
+</style>
+
+
+</head><body>
+<header><div style="display:flex;justify-content:space-between;align-items:center;gap:16px"><div><h1>エモパレDB</h1></div><button id="adminBtn" style="height:42px;padding:0 16px;border:1px solid #b91c1c;border-radius:9px;background:#dc2626;color:#fff;font-weight:800;cursor:pointer">⚙ 会場管理</button></div></header>
+<section id="topPage" class="top-page">
+  <div class="top-hero"><h2>会場を検索</h2></div>
+  <div class="venue-search-card">
+    <label for="topVenueSearch">会場名・キーワード</label>
+    <div class="venue-search-row"><input id="topVenueSearch" placeholder="会場名・読み方・キーワードを入力"><button id="topVenueSearchBtn">検索</button></div>
+    <div id="venueResults" class="venue-results"></div>
+  </div>
+</section>
+<main id="venuePage" class="wrap" style="display:none">
+<div class="top-admin"><button class="back-top" id="backTop">← 会場選択に戻る</button><button class="back-top" id="venueAdminBtn">⚙ 予約管理追加</button></div><div style="margin:4px 0 18px"><h1 id="venueTitle" style="margin:0;font-size:25px"></h1><div id="venueReading" style="color:#64748b;font-size:13px;margin-top:4px"></div></div>
+<div class="top"><div><label>会場名を検索</label><div class="search"><input id="venueSearch" value="CUIMOTTE NAKANOSHIMA"><button onclick="searchVenue()">検索</button></div></div>
+<div><label>表示月</label><select id="month"></select></div>
+<div style="margin-left:auto"><label>広告サイト</label><div class="linkrow ad-links"><button class="copy ad-inactive" data-site="ぐるなび" data-url="">ぐるなび</button><button class="copy ad-active" data-site="カシキル" data-url="https://kasikiru.com/detail/1244">カシキル</button><button class="copy ad-inactive" data-site="スピーディ" data-url="">スピーディ</button><button class="copy ad-inactive" data-site="グルプラ" data-url="">グルプラ</button></div><div id="copyMsg" style="font-size:11px;color:#15803d;margin-top:7px;height:0"></div></div></div>
+<div class="grid"><section class="card"><div class="calhead"><h2 id="title"></h2><div class="nav"><button id="prev">‹</button><button id="next">›</button></div></div>
+<div class="week"><div>日</div><div>月</div><div>火</div><div>水</div><div>木</div><div>金</div><div>土</div></div><div class="days" id="days"></div>
+<p style="font-size:11px;color:#6b7280">※カレンダーの金額は、選択中フロアの17:00開始時の基本料金です。定休日・利用不可日は「—」表示。</p></section>
+<aside class="card detail"><h2 id="dt">日付を選択</h2><div class="sub" id="ds">カレンダーから日付を選んでください</div>
+<label>フロア</label><div class="floorTabs" id="floorTabs"></div>
+<div class="info"><div class="ibox"><small>曜日区分</small><strong id="type">—</strong></div><div class="ibox"><small>選択フロア</small><strong id="floor">全館</strong></div></div>
+<label>幹事入り時間（料金判定基準）</label><select id="time"><option value="">幹事入り時間を選択</option></select>
+<div class="result"><div class="cap">最低保証料金</div><div class="prices"><div class="pricebox"><small>一般宴会</small><div class="price" id="general">—</div></div><div class="pricebox"><small>結婚式二次会</small><div class="price" id="wedding">—</div></div></div><span class="status" id="status">時間を選択してください</span></div>
+<div class="option"><div style="font-size:12px;font-weight:800;margin-bottom:5px">オプション料金</div><div class="option-row"><span>機材費</span><strong id="equipment">11,000円</strong></div><div class="option-row"><span>会場使用料金</span><strong id="venueFee">55,000円</strong></div><div class="option-row"><span>店舗へ発生するオプション料金</span><strong id="storeFee">5,500円</strong></div><div class="store-option-note" id="optionNote">【獲得した機材費を折半】</div></div>
+<div class="note" id="note">日付・フロア・幹事入り時間を選択すると料金を表示します。</div></aside></div></main>
+<div id="globalAdminModal" class="admin-modal" aria-hidden="true">
+  <div class="admin-panel" style="max-width:900px">
+    <div class="admin-head"><div><h2>会場管理</h2><p>システム全体の会場情報を管理します。</p></div><button id="globalAdminClose" class="admin-close">×</button></div>
+    <div class="global-manage-grid">
+      <section class="admin-card global-manage-card"><h3>会場情報管理</h3><p class="admin-help">新しい会場を追加したり、登録済み会場の情報を変更できます。</p><div class="venue-manage-buttons"><button class="admin-primary" id="globalVenueManage">＋ 会場を追加</button><button class="admin-primary" id="globalVenueEdit">会場情報変更</button></div></section>
+    </div>
+  </div>
+</div>
+<div id="venueEditSelectModal" class="admin-modal" aria-hidden="true">
+  <div class="admin-panel" style="max-width:760px">
+    <div class="admin-head"><div><h2>会場情報変更</h2><p>変更したい登録済み会場を検索して選択してください。</p></div><button id="venueEditSelectClose" class="admin-close">×</button></div>
+    <section class="admin-card">
+      <h3>変更する会場を検索</h3>
+      <p class="admin-help">会場名・読み方・検索用キーワードで検索できます。</p>
+      <input id="editVenueSearch" class="edit-venue-search" placeholder="例：クイモッテ、CUIMOTTE">
+      <div id="editVenueList" class="edit-venue-list"></div><div style="margin-top:14px"><button type="button" class="venue-delete-btn" id="editVenueDelete">会場を削除</button></div>
+    </section>
+  </div>
+</div>
+<div id="venueDeleteSelectModal" class="admin-modal" aria-hidden="true">
+  <div class="admin-panel" style="max-width:760px">
+    <div class="admin-head"><div><h2>会場を削除</h2><p>削除したい登録済み会場を検索して選択してください。</p></div><button id="venueDeleteSelectClose" class="admin-close">×</button></div>
+    <section class="admin-card">
+      <h3>削除する会場を検索</h3>
+      <p class="admin-help">会場名・読み方・検索用キーワードで検索できます。</p>
+      <input id="deleteVenueSearch" class="edit-venue-search" placeholder="例：クイモッテ、CUIMOTTE">
+      <div id="deleteVenueList" class="edit-venue-list"></div>
+    </section>
+  </div>
+</div>
+<div id="venueDeleteConfirmModal" class="admin-modal" aria-hidden="true">
+  <div class="admin-panel" style="max-width:520px">
+    <div class="admin-head"><div><h2>会場を削除</h2><p>この操作は登録済みの会場情報を削除します。</p></div><button id="venueDeleteConfirmClose" class="admin-close">×</button></div>
+    <section class="admin-card">
+      <h3 id="deleteConfirmText">本当に削除しますか？</h3>
+      <p class="admin-help" id="deleteConfirmVenueName"></p>
+      <div class="form-actions" style="margin-top:16px"><button type="button" class="admin-secondary" id="venueDeleteCancel">キャンセル</button><button type="button" class="venue-delete-btn" id="venueDeleteExecute">削除</button></div>
+    </section>
+  </div>
+</div>
+<div id="venueAddModal" class="admin-modal" aria-hidden="true">
+  <div class="admin-panel" style="max-width:1000px">
+    <div class="admin-head"><div><h2 id="venueFormTitle">会場を追加</h2><p id="venueFormDescription">会場情報を入力して保存すると、TOPの検索からすぐ利用できます。</p></div><button id="venueAddClose" class="admin-close">×</button></div>
+    <div class="venue-add-form">
+      <section class="form-section"><h3>基本情報</h3><div class="form-grid">
+        <div class="form-field"><label>会場名・正式名称 *</label><input id="addName"></div>
+        <div class="form-field"><label>会場名・読み方</label><input id="addReading"></div>
+        <div class="form-field full"><label>検索用キーワード（カンマ区切り）</label><input id="addKeywords" placeholder="例：クイモッテ,くいもって,CUIMOTTE"></div>
+              </div></section>
+      <section class="form-section"><h3>フロア・会場</h3><div id="floorEditor" class="floor-editor"></div><button type="button" class="admin-secondary" id="addFloorBtn">＋ フロアを追加</button></section>
+      <section class="form-section"><h3>料金判定基準・料金ルール</h3><div class="form-grid">
+        <div class="form-field"><label>料金判定基準</label><select id="addCriterion"><option>幹事入り時間</option><option>開会時間</option><option>受付時間</option><option>その他</option></select></div>
+        <div class="form-field"><label>その他の判定基準</label><input id="addCriterionOther" placeholder="必要な場合のみ"></div>
+        <div class="form-field full"><label>一般宴会：料金ルール</label><textarea id="addGeneralRules" placeholder="曜日・時間帯・月別料金などを自由に入力"></textarea></div>
+        <div class="form-field full"><label>結婚式二次会：料金ルール</label><textarea id="addWeddingRules" placeholder="一般宴会と同じ場合は「一般宴会と同じ」など"></textarea></div>
+        <div class="form-field full"><label>予約不可条件</label><textarea id="addUnavailable"></textarea></div>
+        <div class="form-field full"><label>要相談条件</label><textarea id="addConsult"></textarea></div>
+      </div></section>
+      <section class="form-section"><h3>オプション料金</h3><p class="admin-help">フロア・会場ごとに入力できます。フロアを追加すると、そのフロア専用の入力欄も自動で追加されます。</p><div id="floorOptionEditor" class="floor-option-editor"></div></section>
+      <section class="form-section"><h3>広告サイト</h3>
+        <p class="admin-help">4つの広告サイトはそれぞれ別々に管理します。<strong>表示色・コピー可否は手動で選択</strong>し、URLは右側に貼り付けます。URLの有無から自動判定はしません。</p>
+        <div class="ad-manage-grid">
+          <div class="ad-manage-row"><div class="ad-site-name">ぐるなび</div><select id="addGnaviStatus" class="ad-status-select"><option value="active">緑（コピー可）</option><option value="inactive" selected>グレー（コピー不可）</option></select><input id="addGnavi" class="ad-url-input" placeholder="広告URLを貼り付け"></div>
+          <div class="ad-manage-row"><div class="ad-site-name">カシキル</div><select id="addKasikiruStatus" class="ad-status-select"><option value="active">緑（コピー可）</option><option value="inactive" selected>グレー（コピー不可）</option></select><input id="addKasikiru" class="ad-url-input" placeholder="広告URLを貼り付け"></div>
+          <div class="ad-manage-row"><div class="ad-site-name">スピーディ</div><select id="addSpeedyStatus" class="ad-status-select"><option value="active">緑（コピー可）</option><option value="inactive" selected>グレー（コピー不可）</option></select><input id="addSpeedy" class="ad-url-input" placeholder="広告URLを貼り付け"></div>
+          <div class="ad-manage-row"><div class="ad-site-name">グルプラ</div><select id="addGurupuraStatus" class="ad-status-select"><option value="active">緑（コピー可）</option><option value="inactive" selected>グレー（コピー不可）</option></select><input id="addGurupura" class="ad-url-input" placeholder="広告URLを貼り付け"></div>
+        </div>
+        <div class="form-field" style="margin-top:12px"><label>広告コピー用会場名</label><input id="addCopyName" placeholder="例：【会場名/読み方】"></div>
+      </section>
+      <div id="venueAddError" class="admin-error"></div><div id="venueAddMsg" class="admin-msg"></div>
+      <div class="form-actions"><button class="admin-secondary" id="venueAddCancel">キャンセル</button><button type="button" class="venue-delete-btn" id="venueAddDelete">会場を削除</button><button class="admin-success" id="venueAddSave">この会場を保存</button></div>
+    </div>
+  </div>
+</div>
+<div id="adminModal" class="admin-modal" aria-hidden="true">
+  <div class="admin-panel">
+    <div class="admin-head"><div><h2>管理メニュー</h2><p>予約情報を貼り付けて、予約済み時間を登録できます。</p></div><button id="adminClose" class="admin-close">×</button></div>
+    <div class="admin-grid">
+      <section class="admin-card">
+        <h3>予約情報を貼り付け</h3>
+        <p class="admin-help">メールなどの文章をそのまま貼り付けてOK。必要な項目だけ読み取ります。</p>
+        <textarea id="reservationText" placeholder="例）\n◆実施日　　　：2026年10月03日(土)\n◆予定人数　　：約 50 ～ 70 名様\n◆パーティー時間\n弊社入り時間　：15:30\n幹事様入り時間：16:00\n受付時間　　　：16:30\n開始時間　　　：17:00\n終了時間　　　：19:00\n撤収時間　　　：19:30\n◆フロア　　　：北側（ステージ側）"></textarea>
+        <button id="parseReservation" class="admin-primary">内容を読み取る</button>
+        <div id="parseError" class="admin-error"></div>
+      </section>
+      <section class="admin-card">
+        <h3>読み取り結果</h3>
+        <div class="parsed-grid">
+          <label>実施日<input id="pDate" readonly></label>
+          <label>弊社入り時間<input id="pCompanyIn" readonly></label>
+          <label>幹事様入り時間<input id="pOrganizerIn" readonly></label>
+          <label>受付時間<input id="pReception" readonly></label>
+          <label>開始時間<input id="pStart" readonly></label>
+          <label>終了時間<input id="pEnd" readonly></label>
+          <label>撤収時間<input id="pTeardown" readonly></label>
+          <label>フロア<input id="pFloor" readonly></label>
+        </div>
+        <button id="saveReservation" class="admin-primary" disabled>この内容で予約登録</button>
+        <div id="saveMsg" class="admin-msg"></div>
+      </section>
+    </div>
+    <section class="admin-card reservations-card">
+      <div class="reservation-list-head"><h3>登録済み予約</h3><span>「弊社入り時間」～「撤収時間」を予約済みとして×表示</span></div>
+      <div id="reservationList"></div>
+    </section>
+  </div>
+</div>
+<script>
+const HOLIDAYS={"2026-01-01":"元日","2026-01-12":"成人の日","2026-02-11":"建国記念の日","2026-02-23":"天皇誕生日","2026-03-20":"春分の日","2026-04-29":"昭和の日","2026-05-03":"憲法記念日","2026-05-04":"みどりの日","2026-05-05":"こどもの日","2026-05-06":"振替休日","2026-07-20":"海の日","2026-08-11":"山の日","2026-09-21":"敬老の日","2026-09-22":"休日","2026-09-23":"秋分の日","2026-10-12":"スポーツの日","2026-11-03":"文化の日","2026-11-23":"勤労感謝の日","2027-01-01":"元日","2027-01-11":"成人の日","2027-02-11":"建国記念の日","2027-02-23":"天皇誕生日","2027-03-21":"春分の日","2027-03-22":"振替休日","2027-04-29":"昭和の日","2027-05-03":"憲法記念日","2027-05-04":"みどりの日","2027-05-05":"こどもの日","2027-07-19":"海の日","2027-08-11":"山の日","2027-09-20":"敬老の日","2027-09-23":"秋分の日","2027-10-11":"スポーツの日","2027-11-03":"文化の日","2027-11-23":"勤労感謝の日"};
+let view=new Date(2026,8,1),selected=new Date(2026,8,16),selectedFloor="全館",currentVenue=null;
+const RES_KEY="venueReservationsV1";
+let reservations=JSON.parse(localStorage.getItem(RES_KEY)||"[]");
+const saveReservations=()=>localStorage.setItem(RES_KEY,JSON.stringify(reservations));
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const pad=n=>String(n).padStart(2,"0"),key=d=>`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`,isHoliday=d=>!!HOLIDAYS[key(d)],yen=n=>n==null?"—":n.toLocaleString("ja-JP")+"円";
+const TIMES=["11:00","11:30","12:00","12:30","13:00","13:30","14:00","14:30","15:00","15:30","16:00","16:30","17:00","17:30","18:00","18:30","19:00","19:30","20:00","20:30","21:00"];
+function timeToMin(t){return t? t.split(":").map(Number).reduce((h,m)=>h*60+m):0}
+function dayType(d){if(isHoliday(d)||d.getDay()===0)return"日・祝";if(d.getDay()===6)return"土曜日";return"月～金曜日"}
+const VENUES=[
+ {_id:"cuimotte_nakanoshima",_calcKey:"CUIMOTTE",name:"CUIMOTTE NAKANOSHIMA",reading:"クイモッテ ナカノシマ",keywords:["CUIMOTTE","クイモッテ","くいもって","CUIMOTTE NAKANOSHIMA","クイモッテナカノシマ","くいもってなかのしま"],floors:["全館","北側","南側"],criterion:"幹事入り時間",ads:{"ぐるなび":"","カシキル":"https://kasikiru.com/detail/1244","スピーディ":"","グルプラ":""},adStatus:{"ぐるなび":"inactive","カシキル":"active","スピーディ":"inactive","グルプラ":"inactive"},copyName:"【CUIMOTTE中之島/クイモッテ】",options:{"全館":{equipment:11000,venue:55000,store:5500,note:"【獲得した機材費を折半】"},"北側":{equipment:11000,venue:22000,store:5500,note:"【獲得した機材費を折半】"},"南側":{equipment:11000,venue:22000,store:5500,note:"【獲得した機材費を折半】"}}},
+
+];
+const ADD_STORAGE_KEY="minimumGuaranteeVenues_v1";
+const EDIT_STORAGE_KEY="minimumGuaranteeVenueEdits_v1";
+function normalizeStoredVenue(v){
+  if(!v||typeof v!=="object") return v;
+  v._userAdded=!!v._userAdded;
+  v.ads={
+    "ぐるなび":String(v.ads?.["ぐるなび"]||""),
+    "カシキル":String(v.ads?.["カシキル"]||""),
+    "スピーディ":String(v.ads?.["スピーディ"]||""),
+    "グルプラ":String(v.ads?.["グルプラ"]||"")
+  };
+  v.adStatus={
+    "ぐるなび":v.adStatus?.["ぐるなび"]||"inactive",
+    "カシキル":v.adStatus?.["カシキル"]||"inactive",
+    "スピーディ":v.adStatus?.["スピーディ"]||"inactive",
+    "グルプラ":v.adStatus?.["グルプラ"]||"inactive"
+  };
+  v.floors=Array.isArray(v.floors)&&v.floors.length?v.floors:["全館"];
+  const sourceOptions=v.options&&typeof v.options==="object"?v.options:{};
+  v.options=Object.fromEntries(v.floors.map(f=>{
+    const o=sourceOptions[f]&&typeof sourceOptions[f]==="object"?sourceOptions[f]:{};
+    return [f,{equipment:Number(o.equipment)||0,venue:Number(o.venue)||0,store:Number(o.store)||0,note:String(o.note||"")}];
+  }));
+  return v;
+}
+function loadAddedVenues(){
+  try{
+    // 保存済みの新規会場は、必ず「その会場自身のデータ」として再構築してから画面へ入れる。
+    
+    const raw=localStorage.getItem(ADD_STORAGE_KEY);
+    if(raw){
+      const arr=JSON.parse(raw);
+      if(Array.isArray(arr)){
+        const cleaned=[];
+        arr.forEach(v=>{
+          if(!v||!v.name||VENUES.some(x=>x.name===v.name))return;
+          v=normalizeStoredVenue(v);
+          v._userAdded=true;
+          if(!v._id)v._id=`user_${Date.now()}_${Math.random().toString(36).slice(2,7)}`;
+          VENUES.push(v);
+          cleaned.push(v);
+        });
+        // ここが重要。画面だけでなく、クリーンにした内容を保存データそのものへ戻す。
+        localStorage.setItem(ADD_STORAGE_KEY,JSON.stringify(cleaned));
+      }
+    }
+    const edits=JSON.parse(localStorage.getItem(EDIT_STORAGE_KEY)||"[]");
+    if(Array.isArray(edits))edits.forEach(e=>{
+      if(!e||!e.id) return;
+      const idx=VENUES.findIndex(v=>v._id===e.id);
+      if(idx>=0) VENUES[idx]=e.data;
+    });
+    const deleted=loadDeletedVenueIds();
+    if(deleted.length){for(let i=VENUES.length-1;i>=0;i--){if(deleted.includes(venueId(VENUES[i])))VENUES.splice(i,1)}}
+  }catch(e){console.warn(e)}
+}
+const DELETED_STORAGE_KEY="minimumGuaranteeVenueDeleted_v1";
+function loadDeletedVenueIds(){try{return JSON.parse(localStorage.getItem(DELETED_STORAGE_KEY)||"[]")}catch(e){return[]}}
+function saveDeletedVenueIds(ids){localStorage.setItem(DELETED_STORAGE_KEY,JSON.stringify([...new Set(ids)]))}
+function saveAddedVenues(){const added=VENUES.filter(v=>v._userAdded);localStorage.setItem(ADD_STORAGE_KEY,JSON.stringify(added))}
+function saveVenueEdits(){
+  const edits=VENUES.filter(v=>v._id&&!v._userAdded).map(v=>({id:v._id,data:v}));
+  localStorage.setItem(EDIT_STORAGE_KEY,JSON.stringify(edits));
+}
+function venueId(v){return v._id||(`venue_${normalizeSearchText(v.name)}`)}
+function getFloorOptionData(){
+  const data={};
+  document.querySelectorAll(".floor-option-card").forEach(card=>{
+    const floor=card.dataset.floor||"";
+    data[floor]={
+      equipment:Number(card.querySelector("[data-option=equipment]")?.value)||0,
+      venue:Number(card.querySelector("[data-option=venue]")?.value)||0,
+      store:Number(card.querySelector("[data-option=store]")?.value)||0,
+      note:card.querySelector("[data-option=note]")?.value.trim()||""
+    };
+  });
+  return data;
+}
+function syncFloorOptionEditor(options={}){
+  if(!floorOptionEditor)return;
+  const floors=[...document.querySelectorAll(".floor-input")].map(x=>x.value.trim()).filter(Boolean);
+  floorOptionEditor.innerHTML="";
+  floors.forEach(f=>{
+    const opt=options[f]||{};
+    const card=document.createElement("div");
+    card.className="floor-option-card";
+    card.dataset.floor=f;
+    card.innerHTML=`<div class="floor-option-title">${esc(f)}</div><div class="floor-option-grid"><div class="form-field"><label>機材費</label><input data-option="equipment" type="number" min="0" value="${Number(opt.equipment)||0}"></div><div class="form-field"><label>会場使用料金</label><input data-option="venue" type="number" min="0" value="${Number(opt.venue)||0}"></div><div class="form-field"><label>店舗へ発生するオプション料金</label><input data-option="store" type="number" min="0" value="${Number(opt.store)||0}"></div><div class="form-field"><label>備考</label><input data-option="note" value="${String(opt.note||"").replaceAll('"','&quot;')}"></div></div>`;
+    floorOptionEditor.appendChild(card);
+  });
+}
+function resetFloorEditor(floors=["全館"],options={}){
+  floorEditor.innerHTML="";
+  floors.forEach(f=>addFloorRow(f,false));
+  syncFloorOptionEditor(options);
+}
+function addFloorRow(name="",refresh=true){
+  const row=document.createElement("div");
+  row.className="floor-row";
+  row.innerHTML=`<input class="floor-input" value="${String(name).replaceAll('"','&quot;')}" placeholder="例：全館"><button type="button">削除</button>`;
+  row.querySelector("button").onclick=()=>{if(floorEditor.children.length>1){row.remove();syncFloorOptionEditor(getFloorOptionData())}};
+  row.querySelector(".floor-input").addEventListener("input",()=>syncFloorOptionEditor(getFloorOptionData()));
+  floorEditor.appendChild(row);
+  if(refresh)syncFloorOptionEditor(getFloorOptionData());
+}
+let editingVenue=null;
+function fillVenueForm(v){
+  venueAddError.textContent="";venueAddMsg.textContent="";
+  addName.value=v?.name||"";addReading.value=v?.reading||"";addKeywords.value=(v?.keywords||[]).join(",");
+  const criterion=v?.criterion||"幹事入り時間";
+  if(["幹事入り時間","開会時間","受付時間","その他"].includes(criterion)){addCriterion.value=criterion;addCriterionOther.value=""}else{addCriterion.value="その他";addCriterionOther.value=criterion}
+  addGeneralRules.value=v?.generalRules||"";addWeddingRules.value=v?.weddingRules||"";addUnavailable.value=v?.unavailable||"";addConsult.value=v?.consult||"";
+  resetFloorEditor(v?.floors?.length?v.floors:["全館"],v?.options||{});
+  addGnavi.value=v?.ads?.["ぐるなび"]||"";addKasikiru.value=v?.ads?.["カシキル"]||"";addSpeedy.value=v?.ads?.["スピーディ"]||"";addGurupura.value=v?.ads?.["グルプラ"]||"";
+  addGnaviStatus.value=v?.adStatus?.["ぐるなび"]||"inactive";addKasikiruStatus.value=v?.adStatus?.["カシキル"]||"inactive";addSpeedyStatus.value=v?.adStatus?.["スピーディ"]||"inactive";addGurupuraStatus.value=v?.adStatus?.["グルプラ"]||"inactive";
+  addCopyName.value=v?.copyName||v?.name||"";
+}
+function openVenueAdd(){
+  editingVenue=null;
+  venueFormTitle.textContent="会場を追加";
+  venueFormDescription.textContent="会場情報を入力して保存すると、TOPの検索からすぐ利用できます。";
+  venueAddSave.textContent="この会場を保存";venueAddDelete.style.display="none";
+  // 新規追加は既存会場の値を一切引き継がない。
+  fillVenueForm({name:"",reading:"",keywords:[],floors:["全館"],criterion:"幹事入り時間",ads:{"ぐるなび":"","カシキル":"","スピーディ":"","グルプラ":""},adStatus:{"ぐるなび":"inactive","カシキル":"inactive","スピーディ":"inactive","グルプラ":"inactive"},copyName:"",options:{},generalRules:"",weddingRules:"",unavailable:"",consult:""});
+  venueAddModal.classList.add("open");
+  venueAddModal.setAttribute("aria-hidden","false");
+}
+function openVenueEdit(v){editingVenue=v;venueFormTitle.textContent="会場情報を編集";venueFormDescription.textContent=`「${v.name}」の登録情報を変更します。保存すると会場ページにも反映されます。`;venueAddSave.textContent="変更を保存";venueAddDelete.style.display="";fillVenueForm(v);venueAddModal.classList.add("open");venueAddModal.setAttribute("aria-hidden","false")}
+function closeVenueAdd(){venueAddModal.classList.remove("open");venueAddModal.setAttribute("aria-hidden","true");editingVenue=null}
+function collectVenueForm(base){
+  const name=addName.value.trim(),floors=[...document.querySelectorAll(".floor-input")].map(x=>x.value.trim()).filter(Boolean);
+  const keywords=addKeywords.value.split(/[,、]/).map(x=>x.trim()).filter(Boolean);
+  const criterion=addCriterion.value==="その他"?(addCriterionOther.value.trim()||"その他"):addCriterion.value;
+  const ads={"ぐるなび":addGnavi.value.trim(),"カシキル":addKasikiru.value.trim(),"スピーディ":addSpeedy.value.trim(),"グルプラ":addGurupura.value.trim()};
+  const adStatus={"ぐるなび":addGnaviStatus.value,"カシキル":addKasikiruStatus.value,"スピーディ":addSpeedyStatus.value,"グルプラ":addGurupuraStatus.value};
+  const options=getFloorOptionData();
+  return {...base,name,reading:addReading.value.trim(),keywords,floors,criterion,ads,adStatus,copyName:addCopyName.value.trim()||name,options,generalRules:addGeneralRules.value.trim(),weddingRules:addWeddingRules.value.trim(),unavailable:addUnavailable.value.trim(),consult:addConsult.value.trim()};
+}
+function saveNewVenue(){
+  const name=addName.value.trim(),floors=[...document.querySelectorAll(".floor-input")].map(x=>x.value.trim()).filter(Boolean);
+  if(!name){venueAddError.textContent="正式名称を入力してね。";return}if(!floors.length){venueAddError.textContent="フロアを1つ以上入力してね。";return}
+  if(!editingVenue&&VENUES.some(v=>v.name===name)){venueAddError.textContent="同じ会場名がすでに登録されています。";return}
+  if(editingVenue&&VENUES.some(v=>v!==editingVenue&&v.name===name)){venueAddError.textContent="変更後の会場名が、別の会場と重複しています。";return}
+  const updated=collectVenueForm(editingVenue);
+  if(editingVenue?._calcKey) updated._calcKey=editingVenue._calcKey;
+  if(editingVenue){const oldName=editingVenue.name;if(oldName!==name){reservations.forEach(r=>{if(r.venue===oldName)r.venue=name});saveReservations()}const idx=VENUES.indexOf(editingVenue);VENUES[idx]=updated;if(updated._userAdded)saveAddedVenues();else saveVenueEdits();renderGlobalVenueList();venueAddMsg.textContent="会場情報を更新しました！";const wasCurrent=currentVenue===editingVenue;setTimeout(()=>{closeVenueAdd();if(wasCurrent){setVenue(updated)}},500)}
+  else{updated._userAdded=true;updated._id=`user_${Date.now()}`;VENUES.push(updated);saveAddedVenues();renderGlobalVenueList();venueAddMsg.textContent="会場を保存しました！";setTimeout(()=>{closeVenueAdd();topPage.style.display="block";venuePage.style.display="none";topVenueSearch.value=name;renderVenueResults(name)},500)}
+}
+let deletingVenue=null;
+function openVenueDeleteSelect(){closeVenueEditSelect();globalAdminModal.classList.remove("open");globalAdminModal.setAttribute("aria-hidden","true");deleteVenueSearch.value="";renderDeleteVenueList("");venueDeleteSelectModal.classList.add("open");venueDeleteSelectModal.setAttribute("aria-hidden","false");setTimeout(()=>deleteVenueSearch.focus(),0)}
+function closeVenueDeleteSelect(){venueDeleteSelectModal.classList.remove("open");venueDeleteSelectModal.setAttribute("aria-hidden","true")}
+function renderDeleteVenueList(filter=""){
+  const q=normalizeSearchText(filter);
+  const list=VENUES.filter(v=>!q||[v.name,v.reading,...(v.keywords||[])].some(x=>normalizeSearchText(x).includes(q)));
+  deleteVenueList.innerHTML=list.length?list.map(v=>`<button type="button" class="edit-venue-btn" data-venue-id="${venueId(v)}"><strong>${esc(v.name)}</strong><small>${esc(v.reading||"読み方未登録")} ／ ${v.floors?.length||0}フロア</small></button>`).join(""):`<div class="edit-venue-empty">該当する会場がありません。</div>`;
+  deleteVenueList.querySelectorAll(".edit-venue-btn").forEach(b=>b.onclick=()=>{const v=VENUES.find(x=>venueId(x)===b.dataset.venueId);if(v){deletingVenue=v;closeVenueDeleteSelect();deleteConfirmVenueName.textContent=`「${v.name}」を削除します。`;venueDeleteConfirmModal.classList.add("open");venueDeleteConfirmModal.setAttribute("aria-hidden","false")}});
+}
+function closeVenueDeleteConfirm(){venueDeleteConfirmModal.classList.remove("open");venueDeleteConfirmModal.setAttribute("aria-hidden","true");deletingVenue=null}
+function executeVenueDelete(){
+  if(!deletingVenue)return;
+  const target=deletingVenue;
+  const id=venueId(target);
+  const idx=VENUES.indexOf(target);
+  if(idx>=0)VENUES.splice(idx,1);
+  if(target._userAdded){saveAddedVenues()}else{const deleted=loadDeletedVenueIds();deleted.push(id);saveDeletedVenueIds(deleted);saveVenueEdits()}
+  reservations=reservations.filter(r=>r.venue!==target.name);saveReservations();
+  renderGlobalVenueList();renderVenueResults(topVenueSearch.value);
+  const wasCurrent=currentVenue===target;
+  closeVenueDeleteConfirm();
+  if(wasCurrent){currentVenue=null;venuePage.style.display="none";topPage.style.display="block";adminBtn.textContent="⚙ 会場管理";topVenueSearch.value="";venueResults.innerHTML=""}
+}
+function renderGlobalVenueList(filter=""){
+  const q=normalizeSearchText(filter);
+  const list=VENUES.filter(v=>!q||[v.name,v.reading,...(v.keywords||[])].some(x=>normalizeSearchText(x).includes(q)));
+  editVenueList.innerHTML=list.length?list.map(v=>`<button type="button" class="edit-venue-btn" data-venue-id="${venueId(v)}"><strong>${esc(v.name)}</strong><small>${esc(v.reading||"読み方未登録")} ／ ${v.floors?.length||0}フロア</small></button>`).join(""):`<div class="edit-venue-empty">該当する会場がありません。</div>`;
+  editVenueList.querySelectorAll(".edit-venue-btn").forEach(b=>b.onclick=()=>{const v=VENUES.find(x=>venueId(x)===b.dataset.venueId);if(v){closeVenueEditSelect();openVenueEdit(v)}});
+}
+function floorName(raw){let x=(raw||"").trim(); for(const f of (currentVenue?.floors||[])){if(x.includes(f))return f} if(x.includes("北側"))return"北側";if(x.includes("南側"))return"南側";if(x.includes("全館"))return"全館";if(x.includes("一部利用"))return"一部利用";return x.replace(/[（(].*?[）)]/g,"").trim()||currentVenue?.floors?.[0]||"全館"}
+function normalizeDate(raw){let m=(raw||"").match(/(20\d{2})[年\/-](\d{1,2})[月\/-](\d{1,2})/);return m?`${m[1]}-${pad(m[2])}-${pad(m[3])}`:""}
+function getField(text,label){let re=new RegExp(label+"\\s*[：:]\\s*([^\\n\\r]+)");let m=text.match(re);return m?m[1].trim():""}
+function parseTimeValue(raw){let m=(raw||"").match(/(\d{1,2})\s*[:：]\s*(\d{2})/);return m?`${pad(m[1])}:${m[2]}`:""}
+function parseReservationText(text){let date=normalizeDate(getField(text,"実施日"));let company=parseTimeValue(getField(text,"弊社入り時間"));let organizer=parseTimeValue(getField(text,"幹事様入り時間"));let reception=parseTimeValue(getField(text,"受付時間"));let startT=parseTimeValue(getField(text,"開始時間"));let endT=parseTimeValue(getField(text,"終了時間"));let teardown=parseTimeValue(getField(text,"撤収時間"));let floor=floorName(getField(text,"フロア"));return {date,company,organizer,reception,startT,endT,teardown,floor}}
+function reservationFor(date,f){return reservations.filter(r=>r.date===key(date)&&r.floor===f&&(!r.venue||r.venue===currentVenue?.name))}
+function isBooked(date,f,t){let list=reservationFor(date,f),mins=timeToMin(t);return list.some(r=>mins>=timeToMin(r.company)&&mins<timeToMin(r.teardown))}
+
+const RULE_CACHE={};
+function parseRuleText(text){
+  const out={};let floor=null,grp=null,rule=null;
+  const D="日月火水木金土";
+  const tmin=s=>[...s.matchAll(/(\d{1,2})時(半|(\d{1,2})分)?/g)].map(m=>Number(m[1])*60+(m[2]==="半"?30:(m[3]?Number(m[3]):0)));
+  String(text||"").split(/\n/).forEach(raw=>{
+    const line=raw.normalize("NFKC").trim();if(!line)return;
+    let m;
+    if((m=line.match(/^フロア名\s*:\s*(.+)$/))){floor=m[1].trim();out[floor]=out[floor]||[];grp=null;rule=null;return}
+    if(!floor)return;
+    if(!/^幹事入り/.test(line)&&!/:/.test(line)&&/曜日|祝日/.test(line)&&!/利用/.test(line)){
+      const dows=[];let holiday=false;
+      line.replace(/曜日/g,"").split(/[・,、]/).forEach(tk=>{
+        tk=tk.trim();if(!tk)return;
+        const r=tk.match(/^([日月火水木金土])[~〜-]([日月火水木金土])$/);
+        if(r){for(let i=D.indexOf(r[1]);i<=D.indexOf(r[2]);i++)dows.push(i)}
+        else if(tk.includes("祝"))holiday=true;
+        else if(D.includes(tk))dows.push(D.indexOf(tk));
+      });
+      grp={dows,holiday,rules:[]};out[floor].push(grp);rule=null;return;
+    }
+    if(!grp)return;
+    if((m=line.match(/^幹事入り[がは]?\s*(.*)$/))){
+      const rest=m[1],ci=rest.indexOf(":"),head=ci<0?rest:rest.slice(0,ci),tail=ci<0?"":rest.slice(ci+1);
+      const ts=tmin(head);let from=0,to=1440,n;
+      if(head.includes("以降"))from=ts[0]??0;
+      else if(ts.length>=2){from=ts[0];to=ts[1]}
+      else if(ts.length===1){to=ts[0]}
+      rule={from,to,kind:"months",months:{}};
+      if(/利用不可/.test(head+" "+tail))rule.kind="ng";
+      else if((n=tail.match(/(\d+)\s*名以上/))){rule.kind="people";rule.min=Number(n[1])}
+      else if((n=tail.match(/([\d,]+)\s*円/))){rule.kind="fee";rule.fee=Number(n[1].replace(/,/g,""))}
+      grp.rules.push(rule);return;
+    }
+    if(rule&&(m=line.match(/^([\d,、]+)月\s*:\s*([\d,]+)\s*円/))){
+      const fee=Number(m[2].replace(/,/g,""));
+      m[1].split(/[,、]/).forEach(x=>{if(x)rule.months[Number(x)]=fee});return;
+    }
+    if(/利用不可/.test(line)){grp.rules.push({from:0,to:1440,kind:"ng"});rule=null}
+  });
+  return out;
+}
+function venueRuleResult(v,f,d,t){
+  const pick=text=>{
+    if(!text||!text.includes("フロア名"))return undefined;
+    if(!(text in RULE_CACHE))RULE_CACHE[text]=parseRuleText(text);
+    const p=RULE_CACHE[text];if(!Object.keys(p).length)return undefined;
+    const groups=p[f];if(!groups)return{kind:"none"};
+    const hol=isHoliday(d),dow=d.getDay();
+    let g=hol?groups.find(x=>x.holiday):groups.find(x=>x.dows.includes(dow));
+    if(!g&&hol)g=groups.find(x=>x.dows.includes(0));
+    if(!g)return{kind:"none"};
+    const m=timeToMin(t);
+    const r=g.rules.find(x=>m>=x.from&&m<=x.to);
+    if(!r)return{kind:"none"};
+    if(r.kind==="months"){const fee=r.months[d.getMonth()+1];return fee==null?{kind:"none"}:{kind:"fee",fee}}
+    return r;
+  };
+  const g=pick(v.generalRules);
+  if(g===undefined)return null;
+  if(!t)return{fee:null,status:"幹事入り時間を選択してください",ok:false,note:""};
+  const label=x=>x.kind==="fee"?yen(x.fee):x.kind==="people"?x.min+"名以上":"—";
+  const w=pick(v.weddingRules),wl=w===undefined?label(g):label(w);
+  if(g.kind==="fee")return{fee:g.fee,label:label(g),wlabel:wl,status:"予約可",ok:true,note:""};
+  if(g.kind==="people")return{fee:null,label:label(g),wlabel:wl,status:"予約可",ok:true,note:f+"は"+g.min+"名以上でご利用いただけます。"};
+  return{fee:null,label:"—",wlabel:"—",status:"利用不可",ok:false,note:"この曜日・時間帯は利用不可、または料金設定がありません。"};
+}
+function calc(d,f,t){
+ if(!currentVenue)return{fee:null,status:"会場を選択してください",ok:false,note:""};
+ const mon=d.getMonth()+1, dow=d.getDay(), holiday=isHoliday(d), sat=dow===6, sun=dow===0;
+ if(currentVenue._calcKey==="CUIMOTTE" || currentVenue.name==="CUIMOTTE NAKANOSHIMA"){
+  if(holiday||sun)return{fee:null,status:"定休日",ok:false,note:"日・祝は定休日です。"};
+  let after=["17:00","17:30","18:00","18:30","19:00","19:30","20:00","20:30","21:00"].includes(t), before=["11:00","11:30","12:00","12:30","13:00","13:30","14:00","14:30","15:00","15:30","16:00","16:30"].includes(t);
+  if(f==="全館"){if(sat&&(after||before))return{fee:[2,5,8].includes(mon)?400000:500000,status:"予約可",ok:true,note:"土曜日は11:00～21:00開始が予約可能です。"};if(!sat&&after)return{fee:[2,5,8].includes(mon)?400000:500000,status:"予約可",ok:true,note:"月～金曜日は17:00～21:00開始が予約可能です。"};if(!sat&&before)return{fee:null,status:"利用不可",ok:false,note:"月～金曜日は11:00～16:30開始は利用不可です。"}}
+  if(f==="北側"||f==="南側"){if(sat)return{fee:null,status:"利用不可",ok:false,note:`土曜日は${f}フロアのみ利用不可です。全館利用なら土曜日は予約可能です。`};if(after)return{fee:f==="北側"?200000:100000,status:"予約可",ok:true,note:`月～金曜日：${f}は17:00～21:00開始が予約可能です。`};if(before)return{fee:null,status:"利用不可",ok:false,note:"月～金曜日は11:00～16:30開始は利用不可です。"}}
+  return{fee:null,status:"利用不可",ok:false,note:""};
+ }
+ const rr=venueRuleResult(currentVenue,f,d,t);if(rr)return rr;
+ const v=currentVenue,lines=[];
+ if(v.criterion)lines.push("【料金判定基準】"+v.criterion);
+ if(v.generalRules)lines.push("【一般宴会】"+v.generalRules);
+ if(v.weddingRules)lines.push("【結婚式二次会】"+v.weddingRules);
+ if(v.unavailable)lines.push("【予約不可条件】"+v.unavailable);
+ if(v.consult)lines.push("【要相談条件】"+v.consult);
+ return{fee:null,status:"料金は自動計算の対象外",ok:false,note:lines.length?lines.join("\n"):"この会場は料金の自動計算に未対応です。"};
+}
+function baseCalendar(d){let r=calc(d,selectedFloor,"17:00"); return r.fee}
+function render(){
+ let y=view.getFullYear(),m=view.getMonth(),first=new Date(y,m,1),start=first.getDay(),last=new Date(y,m+1,0).getDate(),pl=new Date(y,m,0).getDate();title.textContent=`${y}年${m+1}月`;month.value=`${y}-${m}`;days.innerHTML="";
+ for(let i=0;i<42;i++){let n=i-start+1,d,muted=false;if(n<1){d=new Date(y,m-1,pl+n);muted=true}else if(n>last){d=new Date(y,m+1,n-last);muted=true}else d=new Date(y,m,n);let r=calc(d,selectedFloor,"17:00"),closed=!r.ok,b=document.createElement("button");let weekendClass=isHoliday(d)||d.getDay()===0?"sunday ":d.getDay()===6?"saturday ":"";let holidayClass=isHoliday(d)?"holiday ":"";b.className="day "+weekendClass+holidayClass+(muted?"muted ":"")+(closed?"closed ":"")+(key(d)===key(selected)?"selected":"");let calFee=r.fee!=null?yen(r.fee):(!closed&&r.label?r.label:(selectedFloor==="一部利用"&&!closed?"24名以上":"—"));b.innerHTML=`<div class="num">${d.getDate()}</div><div class="fee">${calFee}</div>${HOLIDAYS[key(d)]?`<div class="holidayName">${HOLIDAYS[key(d)]}</div>`:""}`;b.onclick=()=>{selected=d;render();detail()};days.appendChild(b)}
+}
+function renderFloorTabs(){floorTabs.innerHTML=(currentVenue?.floors||[]).map(f=>`<button data-floor="${esc(f)}">${esc(f)}</button>`).join("");document.querySelectorAll("#floorTabs button").forEach(b=>b.onclick=()=>{selectedFloor=b.dataset.floor;document.querySelectorAll("#floorTabs button").forEach(x=>x.classList.remove("active"));b.classList.add("active");render();detail()});let active=document.querySelector(`#floorTabs button[data-floor="${CSS.escape(selectedFloor)}"]`);if(!active){selectedFloor=currentVenue?.floors?.[0]||"全館";active=document.querySelector(`#floorTabs button[data-floor="${CSS.escape(selectedFloor)}"]`)}if(active)active.classList.add("active")}
+function refreshTimeOptions(){let current=time.value;time.innerHTML="";let first=document.createElement("option");first.value="";first.textContent="幹事入り時間を選択";time.appendChild(first);TIMES.forEach(t=>{let o=document.createElement("option");o.value=t;let booked=isBooked(selected,selectedFloor,t);o.textContent=booked?`${t}　× 予約済み`:t;o.className=booked?"time-booked":calc(selected,selectedFloor,t).ok?"time-available":"time-unavailable";time.appendChild(o)});if(TIMES.includes(current))time.value=current}
+function renderAds(){
+  document.querySelectorAll(".ad-links .copy").forEach(btn=>{
+    const site=btn.dataset.site;
+    const url=currentVenue?.ads?.[site]||"";
+    const status=currentVenue?.adStatus?.[site]||"inactive";
+    const active=status==="active";
+    btn.dataset.url=active?url:"";
+    btn.classList.toggle("ad-active",active);
+    btn.classList.toggle("ad-inactive",!active);
+    btn.style.cursor=active&&url?"pointer":"default";
+    btn.title=active?(url?"クリックで広告コピー":"緑指定ですがURL未入力"):"コピー不可";
+  });
+}
+function detail(){refreshTimeOptions();let booked=!!time.value&&isBooked(selected,selectedFloor,time.value),r=calc(selected,selectedFloor,time.value);dt.textContent=`${selected.getMonth()+1}月${selected.getDate()}日（${"日月火水木金土"[selected.getDay()]}）の料金`;ds.textContent=`${selected.getFullYear()}年${selected.getMonth()+1}月${selected.getDate()}日（${"日月火水木金土"[selected.getDay()]}）`;type.textContent=dayType(selected);type.style.color=(isHoliday(selected)||selected.getDay()===0)?"#dc2626":selected.getDay()===6?"#2563eb":"#18212f";floor.textContent=selectedFloor;if(booked){general.textContent="—";wedding.textContent="—";status.textContent="予約済み";status.className="status ng";note.textContent="この時間帯はすでに予約が入っています。"}else{general.textContent=r.label||yen(r.fee);wedding.textContent=r.wlabel||r.label||yen(r.fee);status.textContent=r.status+(r.condition?`（${r.condition}）`:"");status.className="status "+(r.ok?"ok":"ng");note.textContent=r.note||""}const opt=currentVenue?.options?.[selectedFloor]||{equipment:0,venue:0,store:0,note:""};equipment.textContent=yen(opt.equipment);venueFee.textContent=yen(opt.venue);storeFee.textContent=yen(opt.store);optionNote.textContent=opt.note||"";optionNote.style.display=opt.note?"block":"none";renderAds();}
+function setVenue(v){currentVenue=v;selectedFloor=v.floors[0];venueSearch.value="";document.title=`最低保証料金｜${v.name}`;venueTitle.textContent=v.name;venueReading.textContent=v.reading;renderFloorTabs();render();detail();renderAds();}
+function showVenuePage(){topPage.style.display="none";venuePage.style.display="block";adminBtn.textContent="⚙ 会場管理";window.scrollTo({top:0,behavior:"smooth"})}
+function showTopPage(){venuePage.style.display="none";topPage.style.display="block";adminBtn.textContent="⚙ 会場管理";window.scrollTo({top:0,behavior:"smooth"});renderVenueResults(topVenueSearch.value)}
+function normalizeSearchText(value){return String(value||"").normalize("NFKC").toLowerCase().replace(/[\s　・･._\-–—/／\\]+/g,"").trim()}
+function findVenueMatches(q=""){
+  const word=normalizeSearchText(q);
+  if(!word)return[];
+  return VENUES.filter(v=>[v.name,v.reading,...(v.keywords||[])].some(x=>normalizeSearchText(x).includes(word)));
+}
+function openVenue(v){
+  if(!v)return;
+  // 先に画面を切り替えてから会場データを反映
+  topPage.style.display="none";
+  venuePage.style.display="block";
+  window.scrollTo({top:0,behavior:"smooth"});
+  try{
+    setVenue(v);
+  }catch(err){
+    console.error("会場表示エラー:",err);
+    venueTitle.textContent=v.name||"";
+    venueReading.textContent=v.reading||"";
+  }
+}
+function renderVenueResults(q=""){
+  const list=findVenueMatches(q);
+  if(!String(q||"").trim()){venueResults.innerHTML="";return;}
+  if(!list.length){venueResults.innerHTML='<div class="no-result">該当する会場が見つかりませんでした。</div>';return;}
+  venueResults.innerHTML=list.map((v,i)=>`<button type="button" class="venue-result" data-venue-index="${VENUES.indexOf(v)}"><strong>${esc(v.name)}</strong><small>${esc(v.reading)}</small></button>`).join("");
+}
+function searchTopVenue(){
+  const list=findVenueMatches(topVenueSearch.value);
+  if(list.length===1){openVenue(list[0]);return;}
+  renderVenueResults(topVenueSearch.value);
+}
+function searchVenue(){const list=findVenueMatches(venueSearch.value);if(list.length===1){setVenue(list[0]);return}if(list.length>1){alert("候補が複数あります。TOPで検索してください。");return}alert("該当する会場が見つかりませんでした。");}
+const venueSearchInput=document.getElementById("venueSearch");const topSearchInput=document.getElementById("topVenueSearch");const topSearchButton=document.getElementById("topVenueSearchBtn");const topResults=document.getElementById("venueResults");topSearchButton.addEventListener("click",searchTopVenue);topSearchInput.addEventListener("input",()=>renderVenueResults(topSearchInput.value));venueSearchInput.addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();searchVenue()}});topSearchInput.addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();searchTopVenue()}});topResults.addEventListener("click",e=>{
+  const b=e.target.closest(".venue-result");
+  if(!b)return;
+  const index=Number(b.dataset.venueIndex);
+  const venue=VENUES[index];
+  if(venue) openVenue(venue);
+});document.getElementById("backTop").addEventListener("click",showTopPage);renderVenueResults();
+for(let i=-3;i<13;i++){let d=new Date(2026,8+i,1),o=document.createElement("option");o.value=`${d.getFullYear()}-${d.getMonth()}`;o.textContent=`${d.getFullYear()}年${d.getMonth()+1}月`;month.appendChild(o)}
+prev.onclick=()=>{view.setMonth(view.getMonth()-1);render()};next.onclick=()=>{view.setMonth(view.getMonth()+1);render()};month.onchange=e=>{let a=e.target.value.split("-").map(Number);view=new Date(a[0],a[1],1);render()};time.onchange=detail;
+document.querySelectorAll(".copy").forEach(btn=>btn.onclick=async()=>{if(!btn.dataset.url)return;let text=`${currentVenue?.copyName||currentVenue?.name||""}\n${btn.dataset.url}`;try{await navigator.clipboard.writeText(text)}catch(e){let ta=document.createElement("textarea");ta.value=text;document.body.appendChild(ta);ta.select();document.execCommand("copy");ta.remove()}document.querySelectorAll(".copy").forEach(x=>x.classList.remove("copied"));btn.classList.add("copied");copyMsg.textContent=`「${btn.dataset.site}」をコピーしました！`;setTimeout(()=>{copyMsg.textContent="";btn.classList.remove("copied")},1800)});
+function formatJPDate(s){let m=s.match(/^(\d{4})-(\d{2})-(\d{2})$/);return m?`${m[1]}年${Number(m[2])}月${Number(m[3])}日`:s}
+function openVenueAdmin(){adminModal.classList.add("open");adminModal.setAttribute("aria-hidden","false");renderReservationList()}
+function closeVenueAdmin(){adminModal.classList.remove("open");adminModal.setAttribute("aria-hidden","true")}
+function openGlobalAdmin(){globalAdminModal.classList.add("open");globalAdminModal.setAttribute("aria-hidden","false")}
+function closeGlobalAdmin(){globalAdminModal.classList.remove("open");globalAdminModal.setAttribute("aria-hidden","true")}
+function openVenueEditSelect(){globalAdminModal.classList.remove("open");globalAdminModal.setAttribute("aria-hidden","true");editVenueSearch.value="";renderGlobalVenueList("");venueEditSelectModal.classList.add("open");venueEditSelectModal.setAttribute("aria-hidden","false");setTimeout(()=>editVenueSearch.focus(),0)}
+function closeVenueEditSelect(){venueEditSelectModal.classList.remove("open");venueEditSelectModal.setAttribute("aria-hidden","true")}
+function showParsed(p){pDate.value=formatJPDate(p.date);pCompanyIn.value=p.company;pOrganizerIn.value=p.organizer;pReception.value=p.reception;pStart.value=p.startT;pEnd.value=p.endT;pTeardown.value=p.teardown;pFloor.value=p.floor}
+function parsedValid(p){return p.date&&p.company&&p.teardown&&p.floor}
+function renderReservationList(){
+ if(!reservations.length){reservationList.innerHTML='<div style="font-size:12px;color:#94a3b8;padding:10px 0">登録済みの予約はありません。</div>';return}
+ reservationList.innerHTML=reservations.slice().sort((a,b)=>(a.date+a.company).localeCompare(b.date+b.company)).map((r,i)=>`<div class="reservation-item"><div><strong>${formatJPDate(r.date)}</strong><br>${esc(r.floor)}</div><div>${r.company} ～ ${r.teardown}</div><div>幹事 ${r.organizer||"—"} ／ 開始 ${r.startT||"—"}</div><button class="reservation-delete" data-index="${reservations.indexOf(r)}">削除</button></div>`).join("");
+ document.querySelectorAll(".reservation-delete").forEach(b=>b.onclick=()=>{reservations.splice(Number(b.dataset.index),1);saveReservations();renderReservationList();render();detail()});
+}
+parseReservation.onclick=()=>{parseError.textContent="";let p=parseReservationText(reservationText.value);showParsed(p);saveReservation.disabled=!parsedValid(p);if(!parsedValid(p))parseError.textContent="実施日・弊社入り時間・撤収時間・フロアを読み取れる形で入力してね。"}
+saveReservation.onclick=()=>{let p=parseReservationText(reservationText.value);if(!parsedValid(p))return;reservations.push({venue:currentVenue?.name||"",date:p.date,floor:p.floor,company:p.company,organizer:p.organizer,reception:p.reception,startT:p.startT,endT:p.endT,teardown:p.teardown});saveReservations();saveMsg.textContent="予約を登録しました！スタッフ画面に反映されています。";renderReservationList();render();detail();setTimeout(()=>saveMsg.textContent="",2200)}
+adminBtn.onclick=openGlobalAdmin;
+venueAdminBtn.onclick=openVenueAdmin;
+adminClose.onclick=closeVenueAdmin;
+adminModal.onclick=e=>{if(e.target===adminModal)closeVenueAdmin()};
+globalAdminClose.onclick=closeGlobalAdmin;
+globalAdminModal.onclick=e=>{if(e.target===globalAdminModal)closeGlobalAdmin()};
+globalVenueManage.onclick=openVenueAdd;
+globalVenueEdit.onclick=openVenueEditSelect;
+venueAddDelete.onclick=()=>{if(!editingVenue)return;const v=editingVenue;closeVenueAdd();deletingVenue=v;deleteConfirmVenueName.textContent="「"+v.name+"」を削除します。";venueDeleteConfirmModal.classList.add("open");venueDeleteConfirmModal.setAttribute("aria-hidden","false")};editVenueDelete.onclick=openVenueDeleteSelect;
+deleteVenueSearch.oninput=()=>renderDeleteVenueList(deleteVenueSearch.value);
+venueDeleteSelectClose.onclick=closeVenueDeleteSelect;
+venueDeleteSelectModal.onclick=e=>{if(e.target===venueDeleteSelectModal)closeVenueDeleteSelect()};
+venueDeleteConfirmClose.onclick=closeVenueDeleteConfirm;
+venueDeleteCancel.onclick=closeVenueDeleteConfirm;
+venueDeleteExecute.onclick=executeVenueDelete;
+venueDeleteConfirmModal.onclick=e=>{if(e.target===venueDeleteConfirmModal)closeVenueDeleteConfirm()};
+editVenueSearch.oninput=()=>renderGlobalVenueList(editVenueSearch.value);
+venueEditSelectClose.onclick=closeVenueEditSelect;
+venueEditSelectModal.onclick=e=>{if(e.target===venueEditSelectModal)closeVenueEditSelect()};
+loadAddedVenues();
+renderGlobalVenueList("");
+addFloorBtn.onclick=()=>addFloorRow();venueAddClose.onclick=closeVenueAdd;venueAddCancel.onclick=closeVenueAdd;venueAddSave.onclick=saveNewVenue;venueAddModal.onclick=e=>{if(e.target===venueAddModal)closeVenueAdd()};
+if(VENUES.length)setVenue(VENUES[0]);
+render();detail();
+</script></body></html>
