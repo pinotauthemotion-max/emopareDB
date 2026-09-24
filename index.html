@@ -1,6 +1,5 @@
-<!-- V52: optionNote修正・Royal専用処理を削除・削除ボタン修正・料金ルール表示・2027祝日・HTMLエスケープ -->
 <!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>エモパレDB｜V54</title>
+<title>エモパレDB｜V55</title>
 <!-- V46: 会場管理モーダルのボタン動作不具合を修正。不要な広告管理参照を削除 -->
 <!-- V38: 会場管理を整理し、「料金設定」を削除。「会場情報変更」を「会場を追加」の右側に配置 -->
 <!-- V35: 会場管理から既存会場を検索・選択して登録情報を編集・保存できるようにした版 -->
@@ -83,7 +82,7 @@ label{display:block;font-size:12px;font-weight:700;color:#6b7280;margin-bottom:6
 </style>
 
 
-</head><body>
+<style>.viewonly #adminBtn,.viewonly #venueAdminBtn{display:none}</style></head><body>
 <header><div style="display:flex;justify-content:space-between;align-items:center;gap:16px"><div><h1>エモパレDB</h1></div><button id="adminBtn" style="height:42px;padding:0 16px;border:1px solid #b91c1c;border-radius:9px;background:#dc2626;color:#fff;font-weight:800;cursor:pointer">⚙ 会場管理</button></div></header>
 <section id="topPage" class="top-page">
   <div class="top-hero"><h2>会場を検索</h2></div>
@@ -113,6 +112,8 @@ label{display:block;font-size:12px;font-weight:700;color:#6b7280;margin-bottom:6
     <div class="admin-head"><div><h2>会場管理</h2><p>システム全体の会場情報を管理します。</p></div><button id="globalAdminClose" class="admin-close">×</button></div>
     <div class="global-manage-grid">
       <section class="admin-card global-manage-card"><h3>会場情報管理</h3><p class="admin-help">新しい会場を追加したり、登録済み会場の情報を変更できます。</p><div class="venue-manage-buttons"><button class="admin-primary" id="globalVenueManage">＋ 会場を追加</button><button class="admin-primary" id="globalVenueEdit">会場情報変更</button></div></section>
+<section class="admin-card global-manage-card"><h3>バックアップ・公開</h3><p class="admin-help">全会場と予約のデータを保存・復元します。公開用HTMLは、閲覧専用の1ファイルとして書き出されます。</p><div style="display:grid;gap:8px"><button type="button" class="admin-primary" id="btnExportJson" style="margin-top:0">バックアップを書き出す</button><button type="button" class="admin-secondary" id="btnImportJson">バックアップを読み込む</button><button type="button" class="admin-success" id="btnExportHtml">公開用HTMLを書き出す</button></div><input type="file" id="importFile" accept=".json,application/json" style="display:none"><div id="dataMsg" class="admin-msg"></div></section>
+
     </div>
   </div>
 </div>
@@ -170,10 +171,10 @@ label{display:block;font-size:12px;font-weight:700;color:#6b7280;margin-bottom:6
       <section class="form-section"><h3>広告サイト</h3>
         <p class="admin-help">4つの広告サイトはそれぞれ別々に管理します。<strong>表示色・コピー可否は手動で選択</strong>し、URLは右側に貼り付けます。URLの有無から自動判定はしません。</p>
         <div class="ad-manage-grid">
-          <div class="ad-manage-row"><div class="ad-site-name">ぐるなび</div><select id="addGnaviStatus" class="ad-status-select"><option value="active">緑（コピー可）</option><option value="inactive" selected>グレー（コピー不可）</option></select><input id="addGnavi" class="ad-url-input" placeholder="広告URLを貼り付け"></div>
-          <div class="ad-manage-row"><div class="ad-site-name">カシキル</div><select id="addKasikiruStatus" class="ad-status-select"><option value="active">緑（コピー可）</option><option value="inactive" selected>グレー（コピー不可）</option></select><input id="addKasikiru" class="ad-url-input" placeholder="広告URLを貼り付け"></div>
-          <div class="ad-manage-row"><div class="ad-site-name">スピーディ</div><select id="addSpeedyStatus" class="ad-status-select"><option value="active">緑（コピー可）</option><option value="inactive" selected>グレー（コピー不可）</option></select><input id="addSpeedy" class="ad-url-input" placeholder="広告URLを貼り付け"></div>
-          <div class="ad-manage-row"><div class="ad-site-name">グルプラ</div><select id="addGurupuraStatus" class="ad-status-select"><option value="active">緑（コピー可）</option><option value="inactive" selected>グレー（コピー不可）</option></select><input id="addGurupura" class="ad-url-input" placeholder="広告URLを貼り付け"></div>
+          <div class="ad-manage-row"><div class="ad-site-name">ぐるなび</div><select id="addGnaviStatus" class="ad-status-select"><option value="active">緑（コピー可）</option><option value="inactive" selected="">グレー（コピー不可）</option></select><input id="addGnavi" class="ad-url-input" placeholder="広告URLを貼り付け"></div>
+          <div class="ad-manage-row"><div class="ad-site-name">カシキル</div><select id="addKasikiruStatus" class="ad-status-select"><option value="active">緑（コピー可）</option><option value="inactive" selected="">グレー（コピー不可）</option></select><input id="addKasikiru" class="ad-url-input" placeholder="広告URLを貼り付け"></div>
+          <div class="ad-manage-row"><div class="ad-site-name">スピーディ</div><select id="addSpeedyStatus" class="ad-status-select"><option value="active">緑（コピー可）</option><option value="inactive" selected="">グレー（コピー不可）</option></select><input id="addSpeedy" class="ad-url-input" placeholder="広告URLを貼り付け"></div>
+          <div class="ad-manage-row"><div class="ad-site-name">グルプラ</div><select id="addGurupuraStatus" class="ad-status-select"><option value="active">緑（コピー可）</option><option value="inactive" selected="">グレー（コピー不可）</option></select><input id="addGurupura" class="ad-url-input" placeholder="広告URLを貼り付け"></div>
         </div>
         <div class="form-field" style="margin-top:12px"><label>広告コピー用会場名</label><input id="addCopyName" placeholder="例：【会場名/読み方】"></div>
       </section>
@@ -196,16 +197,16 @@ label{display:block;font-size:12px;font-weight:700;color:#6b7280;margin-bottom:6
       <section class="admin-card">
         <h3>読み取り結果</h3>
         <div class="parsed-grid">
-          <label>実施日<input id="pDate" readonly></label>
-          <label>弊社入り時間<input id="pCompanyIn" readonly></label>
-          <label>幹事様入り時間<input id="pOrganizerIn" readonly></label>
-          <label>受付時間<input id="pReception" readonly></label>
-          <label>開始時間<input id="pStart" readonly></label>
-          <label>終了時間<input id="pEnd" readonly></label>
-          <label>撤収時間<input id="pTeardown" readonly></label>
-          <label>フロア<input id="pFloor" readonly></label>
+          <label>実施日<input id="pDate" readonly=""></label>
+          <label>弊社入り時間<input id="pCompanyIn" readonly=""></label>
+          <label>幹事様入り時間<input id="pOrganizerIn" readonly=""></label>
+          <label>受付時間<input id="pReception" readonly=""></label>
+          <label>開始時間<input id="pStart" readonly=""></label>
+          <label>終了時間<input id="pEnd" readonly=""></label>
+          <label>撤収時間<input id="pTeardown" readonly=""></label>
+          <label>フロア<input id="pFloor" readonly=""></label>
         </div>
-        <button id="saveReservation" class="admin-primary" disabled>この内容で予約登録</button>
+        <button id="saveReservation" class="admin-primary" disabled="">この内容で予約登録</button>
         <div id="saveMsg" class="admin-msg"></div>
       </section>
     </div>
@@ -215,7 +216,11 @@ label{display:block;font-size:12px;font-weight:700;color:#6b7280;margin-bottom:6
     </section>
   </div>
 </div>
+<script id="embedded-data" type="application/json">{"app":"emopare-db","version":1,"exportedAt":"2026-09-24T07:20:29.105Z","venues":[{"_id":"cuimotte_nakanoshima","_calcKey":"CUIMOTTE","name":"CUIMOTTE NAKANOSHIMA","reading":"クイモッテ ナカノシマ","keywords":["CUIMOTTE","クイモッテ","くいもって","CUIMOTTE NAKANOSHIMA","クイモッテナカノシマ","くいもってなかのしま"],"floors":["全館","北側","南側"],"criterion":"幹事入り時間","ads":{"ぐるなび":"","カシキル":"https://kasikiru.com/detail/1244","スピーディ":"","グルプラ":""},"adStatus":{"ぐるなび":"inactive","カシキル":"active","スピーディ":"inactive","グルプラ":"inactive"},"copyName":"【CUIMOTTE中之島/クイモッテ】","options":{"全館":{"equipment":11000,"venue":55000,"store":5500,"note":"【獲得した機材費を折半】"},"北側":{"equipment":11000,"venue":22000,"store":5500,"note":"【獲得した機材費を折半】"},"南側":{"equipment":11000,"venue":22000,"store":5500,"note":"【獲得した機材費を折半】"}},"address":"","generalRules":"","weddingRules":"","unavailable":"","consult":"","_userAdded":false},{"name":"Royal Garden Cafe うめきた","reading":"ロイヤルガーデンカフェウメキタ","keywords":["ロイヤル","ろいやる","Royal","ROYAL"],"floors":["全館","一部利用"],"criterion":"幹事入り時間","ads":{"ぐるなび":"https://party-wedding.gnavi.co.jp/site/2/kemy400/","カシキル":"https://kasikiru.com/detail/1144","スピーディ":"https://www.e-kaijou.space/venue/88357","グルプラ":""},"adStatus":{"ぐるなび":"active","カシキル":"active","スピーディ":"active","グルプラ":"inactive"},"copyName":"【Royal Garden Cafe UMEKITA/ロイヤルガーデンカフェ】","options":{"全館":{"equipment":0,"venue":33000,"store":0,"note":""},"一部利用":{"equipment":0,"venue":11000,"store":0,"note":""}},"generalRules":"フロア名：一部利用\n\n月～金曜日\n幹事入りが16時～21時まで：24名以上\n幹事入りが11時～15時半は利用不可\n\n土・日・祝日\n一部利用の利用不可\n\n\n\nフロア名：全館\n\n月～木曜日\n幹事入りが11時～14時半まで\n1，4，5，7，8，9，10，11月：400,000円\n2，6月：350,000円\n3，12月：450,000円\n\n幹事入りが15時以降\n1，2，4，5，6，7，8，9，10，11月：150,000円\n3，12月：250,000円\n\n金曜日\n幹事入りが11時～14時半まで\n1，2，4，5，6，7，8，9，10，11月：400,000円\n3，12月：450,000円\n\n幹事入りが15時以降\n1，2，4，5，6，7，8，9，10，11月：200,000円\n3，12月：300,000円\n\n土・日・祝日\n幹事入りが11時～15時半まで：600,000円\n幹事入りが16時～16時半：500,000円\n幹事入りが17時～17時半：300,000円\n幹事入りが18時以降：250,000円","weddingRules":"一般宴会と同じ","unavailable":"土・日・祝日\n一部利用の予約不可","consult":"","_userAdded":true,"_id":"user_1790231271457"}],"reservations":[]}</script>
 <script>
+
+const PRISTINE_HTML="<!doctype html>"+document.documentElement.outerHTML;
+const EMBEDDED=(()=>{try{const t=document.getElementById("embedded-data").textContent.trim();return t&&t!=="null"?JSON.parse(t):null}catch(e){return null}})();
 const HOLIDAYS={"2026-01-01":"元日","2026-01-12":"成人の日","2026-02-11":"建国記念の日","2026-02-23":"天皇誕生日","2026-03-20":"春分の日","2026-04-29":"昭和の日","2026-05-03":"憲法記念日","2026-05-04":"みどりの日","2026-05-05":"こどもの日","2026-05-06":"振替休日","2026-07-20":"海の日","2026-08-11":"山の日","2026-09-21":"敬老の日","2026-09-22":"休日","2026-09-23":"秋分の日","2026-10-12":"スポーツの日","2026-11-03":"文化の日","2026-11-23":"勤労感謝の日","2027-01-01":"元日","2027-01-11":"成人の日","2027-02-11":"建国記念の日","2027-02-23":"天皇誕生日","2027-03-21":"春分の日","2027-03-22":"振替休日","2027-04-29":"昭和の日","2027-05-03":"憲法記念日","2027-05-04":"みどりの日","2027-05-05":"こどもの日","2027-07-19":"海の日","2027-08-11":"山の日","2027-09-20":"敬老の日","2027-09-23":"秋分の日","2027-10-11":"スポーツの日","2027-11-03":"文化の日","2027-11-23":"勤労感謝の日"};
 let view=new Date(2026,8,1),selected=new Date(2026,8,16),selectedFloor="全館",currentVenue=null;
 const RES_KEY="venueReservationsV1";
@@ -602,9 +607,44 @@ venueDeleteConfirmModal.onclick=e=>{if(e.target===venueDeleteConfirmModal)closeV
 editVenueSearch.oninput=()=>renderGlobalVenueList(editVenueSearch.value);
 venueEditSelectClose.onclick=closeVenueEditSelect;
 venueEditSelectModal.onclick=e=>{if(e.target===venueEditSelectModal)closeVenueEditSelect()};
-loadAddedVenues();
+
+window.BUILTIN_IDS=VENUES.map(v=>v._id).filter(Boolean);
+if(EMBEDDED){VENUES.length=0;(EMBEDDED.venues||[]).forEach(v=>{if(v&&v.name)VENUES.push(normalizeStoredVenue(v))});reservations=Array.isArray(EMBEDDED.reservations)?EMBEDDED.reservations:[];document.body.classList.add("viewonly")}else loadAddedVenues();
 renderGlobalVenueList("");
 addFloorBtn.onclick=()=>addFloorRow();venueAddClose.onclick=closeVenueAdd;venueAddCancel.onclick=closeVenueAdd;venueAddSave.onclick=saveNewVenue;venueAddModal.onclick=e=>{if(e.target===venueAddModal)closeVenueAdd()};
+
+function dlFile(name,text,type){const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([text],{type}));a.download=name;document.body.appendChild(a);a.click();a.remove()}
+function stampNow(){const d=new Date();return d.getFullYear()+pad(d.getMonth()+1)+pad(d.getDate())+"_"+pad(d.getHours())+pad(d.getMinutes())}
+function dataSnapshot(){return{app:"emopare-db",version:1,exportedAt:new Date().toISOString(),venues:VENUES,reservations:reservations}}
+function dataMsgShow(t,bad){dataMsg.textContent=t;dataMsg.style.color=bad?"#b91c1c":"#15803d"}
+btnExportJson.onclick=()=>{dlFile("emopare_backup_"+stampNow()+".json",JSON.stringify(dataSnapshot(),null,1),"application/json");dataMsgShow("バックアップを書き出しました（"+VENUES.length+"会場）")};
+btnExportHtml.onclick=()=>{
+  const json=JSON.stringify(dataSnapshot()).replace(/</g,"\\u003c");
+  const html=PRISTINE_HTML.replace(/(<script id="embedded-data" type="application\/json">)[\s\S]*?(<\/script>)/,(m,a,b)=>a+json+b);
+  dlFile("emopare_viewer_"+stampNow()+".html",html,"text/html");
+  dataMsgShow("公開用HTMLを書き出しました（"+VENUES.length+"会場）。サーバーへ上書きアップロードしてください。");
+};
+btnImportJson.onclick=()=>importFile.click();
+importFile.onchange=()=>{
+  const file=importFile.files[0];if(!file)return;
+  const r=new FileReader();
+  r.onload=()=>{
+    try{
+      const d=JSON.parse(String(r.result));
+      if(!d||!Array.isArray(d.venues))throw new Error("バックアップファイルの形式が違います。");
+      const vs=d.venues.map(v=>normalizeStoredVenue(v)).filter(v=>v&&v.name);
+      if(!vs.length)throw new Error("会場データが入っていません。");
+      if(!confirm("現在のデータを、バックアップ（"+vs.length+"会場）で置き換えます。よろしいですか？"))return;
+      const ids=vs.map(venueId);
+      localStorage.setItem(ADD_STORAGE_KEY,JSON.stringify(vs.filter(v=>v._userAdded)));
+      localStorage.setItem(EDIT_STORAGE_KEY,JSON.stringify(vs.filter(v=>!v._userAdded&&v._id).map(v=>({id:v._id,data:v}))));
+      localStorage.setItem(DELETED_STORAGE_KEY,JSON.stringify(BUILTIN_IDS.filter(id=>!ids.includes(id))));
+      localStorage.setItem(RES_KEY,JSON.stringify(Array.isArray(d.reservations)?d.reservations:[]));
+      location.reload();
+    }catch(e){dataMsgShow("読み込めませんでした："+e.message,true)}
+  };
+  r.readAsText(file,"utf-8");importFile.value="";
+};
 if(VENUES.length)setVenue(VENUES[0]);
 render();detail();
 </script></body></html>
