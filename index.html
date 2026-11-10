@@ -1,6 +1,5 @@
-<!-- V52: optionNote修正・Royal専用処理を削除・削除ボタン修正・料金ルール表示・2027祝日・HTMLエスケープ -->
 <!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>エモパレDB｜スタッフ用（V103ベース）</title>
+<title>エモパレDB｜V103</title>
 <!-- V103修正: V102のレイアウト変更後、左カラム（○月○日の料金カード＋月間カレンダー）を縦に積んだ
 結果、全体の高さがV101より大幅に増えてスクロールが必要になっていた不具合を修正。カード余白・見出しの
 マージン・カレンダーの日付セルの高さ/行間・料金表示欄の余白などを詰めて、全体のサイズ感がV101に近い
@@ -211,7 +210,7 @@ label{display:block;font-size:12px;font-weight:700;color:#6b7280;margin-bottom:4
 .time-opt.time-csv-confirmed .time-opt-mark{background:#dc2626}
 .time-opt.time-csv-tentative .time-opt-mark{background:#9a3412;color:#fff}
 .time-opt.time-out-of-range{color:#991b1b}
-.time-opt.time-out-of-range .time-opt-mark{background:#991b1b}#status{display:none !important}@media(max-width:850px){.admin-grid{grid-template-columns:1fr}.reservation-item{grid-template-columns:1fr 1fr}.reservation-item button{grid-column:2}}
+.time-opt.time-out-of-range .time-opt-mark{background:#991b1b}@media(max-width:850px){.admin-grid{grid-template-columns:1fr}.reservation-item{grid-template-columns:1fr 1fr}.reservation-item button{grid-column:2}}
 </style>
 
 <style id="venue-add-css">
@@ -361,9 +360,26 @@ label{display:block;font-size:12px;font-weight:700;color:#6b7280;margin-bottom:4
       <section class="form-section"><h3>料金判定基準・料金ルール</h3><div class="form-grid">
         <div class="form-field"><label>料金判定基準</label><select id="addCriterion"><option>幹事入り時間</option><option>開会時間</option><option>受付時間</option><option>その他</option></select></div>
         <div class="form-field"><label>その他の判定基準</label><input id="addCriterionOther" placeholder="必要な場合のみ"></div>
-        <div class="form-field full"><label>一般宴会：料金ルール</label><textarea id="addGeneralRules" placeholder="書き方の例（フロアが1つなら「フロア名：」の行は不要）&#10;フロア名：全館&#10;月～木曜日、1～9月&#10;幹事入りが11時～14時まで：166,000円&#10;月～木曜日、10～12月&#10;幹事入りが11時～14時まで：200,000円&#10;金・土・日・祝日&#10;幹事入りが11時～21時まで：300,000円&#10;祝前日&#10;幹事入りが11時～21時まで：350,000円&#10;特定日：8/13～8/16&#10;幹事入りが17時～21時まで：600,000円&#10;特定日：2026/11/1～2026/11/4&#10;幹事入りが11時～21時まで：200,000円&#10;※「：利用不可」「：40名以上」「：要相談」も使えます&#10;※特定日は年を省略すると毎年適用／年を書くとその年だけに限定されます"></textarea></div>
+        <div class="form-field full"><label>一般宴会：料金ルール</label><textarea id="addGeneralRules" placeholder="書き方の例（フロアが1つなら「フロア名：」の行は不要）
+フロア名：全館
+月～木曜日、1～9月
+幹事入りが11時～14時まで：166,000円
+月～木曜日、10～12月
+幹事入りが11時～14時まで：200,000円
+金・土・日・祝日
+幹事入りが11時～21時まで：300,000円
+祝前日
+幹事入りが11時～21時まで：350,000円
+特定日：8/13～8/16
+幹事入りが17時～21時まで：600,000円
+特定日：2026/11/1～2026/11/4
+幹事入りが11時～21時まで：200,000円
+※「：利用不可」「：40名以上」「：要相談」も使えます
+※特定日は年を省略すると毎年適用／年を書くとその年だけに限定されます"></textarea></div>
         <div class="form-field full"><label>結婚式二次会：料金ルール</label><textarea id="addWeddingRules" placeholder="一般宴会と同じ場合は「一般宴会と同じ」など"></textarea></div>
-        <div class="form-field full"><label>予約可能時間</label><textarea id="addUnavailable" placeholder="予約できる最速/最遅の幹事入り時間がある場合は「予約可能時間:10:00-20:00」のように1行書くと、その範囲外が自動で幹事入り時間の選択肢に×で表示されます&#10;（例）予約可能時間:10:00-20:00&#10;その他の条件は自由に記載できます"></textarea></div>
+        <div class="form-field full"><label>予約可能時間</label><textarea id="addUnavailable" placeholder="予約できる最速/最遅の幹事入り時間がある場合は「予約可能時間:10:00-20:00」のように1行書くと、その範囲外が自動で幹事入り時間の選択肢に×で表示されます
+（例）予約可能時間:10:00-20:00
+その他の条件は自由に記載できます"></textarea></div>
         <div class="form-field full"><label>要相談条件</label><textarea id="addConsult"></textarea></div>
       </div></section>
       <section class="form-section"><h3>収容人数</h3><p class="admin-help">会場全体の収容人数です（フロアごとではありません）。数値以外（「要相談」など）も入力できます。CSVの一括反映に対応しています。</p>
@@ -390,34 +406,34 @@ label{display:block;font-size:12px;font-weight:700;color:#6b7280;margin-bottom:4
       <section class="form-section"><h3>広告サイト</h3>
         <p class="admin-help">4つの広告サイトはそれぞれ別々に管理します。<strong>表示色・コピー可否は手動で選択</strong>し、URLは右側に貼り付けます。URLの有無から自動判定はしません。</p>
         <div class="ad-manage-grid">
-          <div class="ad-manage-row"><div class="ad-site-name">ぐるなび</div><select id="addGnaviStatus" class="ad-status-select"><option value="active">緑（コピー可）</option><option value="inactive" selected>グレー（コピー不可）</option></select><input id="addGnavi" class="ad-url-input" placeholder="広告URLを貼り付け"></div>
-          <div class="ad-manage-row"><div class="ad-site-name">カシキル</div><select id="addKasikiruStatus" class="ad-status-select"><option value="active">緑（コピー可）</option><option value="inactive" selected>グレー（コピー不可）</option></select><input id="addKasikiru" class="ad-url-input" placeholder="広告URLを貼り付け"></div>
-          <div class="ad-manage-row"><div class="ad-site-name">スピーディ</div><select id="addSpeedyStatus" class="ad-status-select"><option value="active">緑（コピー可）</option><option value="inactive" selected>グレー（コピー不可）</option></select><input id="addSpeedy" class="ad-url-input" placeholder="広告URLを貼り付け"></div>
-          <div class="ad-manage-row"><div class="ad-site-name">グルプラ</div><select id="addGurupuraStatus" class="ad-status-select"><option value="active">緑（コピー可）</option><option value="inactive" selected>グレー（コピー不可）</option></select><input id="addGurupura" class="ad-url-input" placeholder="広告URLを貼り付け"></div>
+          <div class="ad-manage-row"><div class="ad-site-name">ぐるなび</div><select id="addGnaviStatus" class="ad-status-select"><option value="active">緑（コピー可）</option><option value="inactive" selected="">グレー（コピー不可）</option></select><input id="addGnavi" class="ad-url-input" placeholder="広告URLを貼り付け"></div>
+          <div class="ad-manage-row"><div class="ad-site-name">カシキル</div><select id="addKasikiruStatus" class="ad-status-select"><option value="active">緑（コピー可）</option><option value="inactive" selected="">グレー（コピー不可）</option></select><input id="addKasikiru" class="ad-url-input" placeholder="広告URLを貼り付け"></div>
+          <div class="ad-manage-row"><div class="ad-site-name">スピーディ</div><select id="addSpeedyStatus" class="ad-status-select"><option value="active">緑（コピー可）</option><option value="inactive" selected="">グレー（コピー不可）</option></select><input id="addSpeedy" class="ad-url-input" placeholder="広告URLを貼り付け"></div>
+          <div class="ad-manage-row"><div class="ad-site-name">グルプラ</div><select id="addGurupuraStatus" class="ad-status-select"><option value="active">緑（コピー可）</option><option value="inactive" selected="">グレー（コピー不可）</option></select><input id="addGurupura" class="ad-url-input" placeholder="広告URLを貼り付け"></div>
         </div>
         <div class="form-field" style="margin-top:12px"><label>広告コピー用会場名</label><input id="addCopyName" placeholder="例：【会場名/読み方】"></div>
       </section>
       <section class="form-section"><h3>広告サイト（詳細版）</h3>
         <p class="admin-help">上の「広告サイト」のコピーボタンの下に、もう1段（紫色）ボタンを追加します。URLは上で入力したものをそのまま使うので、ここでは立地・ご利用人数・1名様あたりの飲食代だけ入力してください。コピーすると「URL＋立地＋人数＋飲食代」がまとめてコピーされます。</p>
         <div class="ad-detail-manage-grid">
-          <div class="ad-manage-row"><div class="ad-site-name">ぐるなび</div><select id="addGnaviDetailStatus" class="ad-status-select"><option value="active">紫（コピー可）</option><option value="inactive" selected>グレー（コピー不可）</option></select></div>
+          <div class="ad-manage-row"><div class="ad-site-name">ぐるなび</div><select id="addGnaviDetailStatus" class="ad-status-select"><option value="active">紫（コピー可）</option><option value="inactive" selected="">グレー（コピー不可）</option></select></div>
           <div class="ad-detail-fields"><input id="addGnaviDetailLocation" placeholder="立地（例：新大阪駅から徒歩4分）"><input id="addGnaviDetailCapacity" placeholder="ご利用人数（例：着席100名）"><input id="addGnaviDetailPrice" placeholder="1名様あたりの飲食代（例：4,800円～）"></div>
-          <div class="ad-manage-row"><div class="ad-site-name">カシキル</div><select id="addKasikiruDetailStatus" class="ad-status-select"><option value="active">紫（コピー可）</option><option value="inactive" selected>グレー（コピー不可）</option></select></div>
+          <div class="ad-manage-row"><div class="ad-site-name">カシキル</div><select id="addKasikiruDetailStatus" class="ad-status-select"><option value="active">紫（コピー可）</option><option value="inactive" selected="">グレー（コピー不可）</option></select></div>
           <div class="ad-detail-fields"><input id="addKasikiruDetailLocation" placeholder="立地（例：新大阪駅から徒歩4分）"><input id="addKasikiruDetailCapacity" placeholder="ご利用人数（例：着席100名）"><input id="addKasikiruDetailPrice" placeholder="1名様あたりの飲食代（例：4,800円～）"></div>
-          <div class="ad-manage-row"><div class="ad-site-name">スピーディ</div><select id="addSpeedyDetailStatus" class="ad-status-select"><option value="active">紫（コピー可）</option><option value="inactive" selected>グレー（コピー不可）</option></select></div>
+          <div class="ad-manage-row"><div class="ad-site-name">スピーディ</div><select id="addSpeedyDetailStatus" class="ad-status-select"><option value="active">紫（コピー可）</option><option value="inactive" selected="">グレー（コピー不可）</option></select></div>
           <div class="ad-detail-fields"><input id="addSpeedyDetailLocation" placeholder="立地（例：新大阪駅から徒歩4分）"><input id="addSpeedyDetailCapacity" placeholder="ご利用人数（例：着席100名）"><input id="addSpeedyDetailPrice" placeholder="1名様あたりの飲食代（例：4,800円～）"></div>
-          <div class="ad-manage-row"><div class="ad-site-name">グルプラ</div><select id="addGurupuraDetailStatus" class="ad-status-select"><option value="active">紫（コピー可）</option><option value="inactive" selected>グレー（コピー不可）</option></select></div>
+          <div class="ad-manage-row"><div class="ad-site-name">グルプラ</div><select id="addGurupuraDetailStatus" class="ad-status-select"><option value="active">紫（コピー可）</option><option value="inactive" selected="">グレー（コピー不可）</option></select></div>
           <div class="ad-detail-fields"><input id="addGurupuraDetailLocation" placeholder="立地（例：新大阪駅から徒歩4分）"><input id="addGurupuraDetailCapacity" placeholder="ご利用人数（例：着席100名）"><input id="addGurupuraDetailPrice" placeholder="1名様あたりの飲食代（例：4,800円～）"></div>
         </div>
       </section>
       <section class="form-section"><h3>広告サイトへ</h3>
         <p class="admin-help">上の「広告サイト」（コピー用）とは別の項目です。ここで指定したボタンは押すとURLのページへ直接移動します。5つ（ベスト／ぐるなび／カシキル／スピーディ／グルプラ）をそれぞれ別々に管理します。</p>
         <div class="ad-manage-grid">
-          <div class="ad-manage-row"><div class="ad-site-name">ベスト</div><select id="addBestLinkStatus" class="ad-status-select"><option value="active">オレンジ（遷移可）</option><option value="inactive" selected>グレー（遷移不可）</option></select><input id="addBestLink" class="ad-url-input" placeholder="広告URLを貼り付け"></div>
-          <div class="ad-manage-row"><div class="ad-site-name">ぐるなび</div><select id="addGnaviLinkStatus" class="ad-status-select"><option value="active">オレンジ（遷移可）</option><option value="inactive" selected>グレー（遷移不可）</option></select><input id="addGnaviLink" class="ad-url-input" placeholder="広告URLを貼り付け"></div>
-          <div class="ad-manage-row"><div class="ad-site-name">カシキル</div><select id="addKasikiruLinkStatus" class="ad-status-select"><option value="active">オレンジ（遷移可）</option><option value="inactive" selected>グレー（遷移不可）</option></select><input id="addKasikiruLink" class="ad-url-input" placeholder="広告URLを貼り付け"></div>
-          <div class="ad-manage-row"><div class="ad-site-name">スピーディ</div><select id="addSpeedyLinkStatus" class="ad-status-select"><option value="active">オレンジ（遷移可）</option><option value="inactive" selected>グレー（遷移不可）</option></select><input id="addSpeedyLink" class="ad-url-input" placeholder="広告URLを貼り付け"></div>
-          <div class="ad-manage-row"><div class="ad-site-name">グルプラ</div><select id="addGurupuraLinkStatus" class="ad-status-select"><option value="active">オレンジ（遷移可）</option><option value="inactive" selected>グレー（遷移不可）</option></select><input id="addGurupuraLink" class="ad-url-input" placeholder="広告URLを貼り付け"></div>
+          <div class="ad-manage-row"><div class="ad-site-name">ベスト</div><select id="addBestLinkStatus" class="ad-status-select"><option value="active">オレンジ（遷移可）</option><option value="inactive" selected="">グレー（遷移不可）</option></select><input id="addBestLink" class="ad-url-input" placeholder="広告URLを貼り付け"></div>
+          <div class="ad-manage-row"><div class="ad-site-name">ぐるなび</div><select id="addGnaviLinkStatus" class="ad-status-select"><option value="active">オレンジ（遷移可）</option><option value="inactive" selected="">グレー（遷移不可）</option></select><input id="addGnaviLink" class="ad-url-input" placeholder="広告URLを貼り付け"></div>
+          <div class="ad-manage-row"><div class="ad-site-name">カシキル</div><select id="addKasikiruLinkStatus" class="ad-status-select"><option value="active">オレンジ（遷移可）</option><option value="inactive" selected="">グレー（遷移不可）</option></select><input id="addKasikiruLink" class="ad-url-input" placeholder="広告URLを貼り付け"></div>
+          <div class="ad-manage-row"><div class="ad-site-name">スピーディ</div><select id="addSpeedyLinkStatus" class="ad-status-select"><option value="active">オレンジ（遷移可）</option><option value="inactive" selected="">グレー（遷移不可）</option></select><input id="addSpeedyLink" class="ad-url-input" placeholder="広告URLを貼り付け"></div>
+          <div class="ad-manage-row"><div class="ad-site-name">グルプラ</div><select id="addGurupuraLinkStatus" class="ad-status-select"><option value="active">オレンジ（遷移可）</option><option value="inactive" selected="">グレー（遷移不可）</option></select><input id="addGurupuraLink" class="ad-url-input" placeholder="広告URLを貼り付け"></div>
         </div>
       </section>
       <div id="venueAddError" class="admin-error"></div><div id="venueAddMsg" class="admin-msg"></div>
@@ -446,16 +462,16 @@ label{display:block;font-size:12px;font-weight:700;color:#6b7280;margin-bottom:4
       <section class="admin-card">
         <h3>読み取り結果</h3>
         <div class="parsed-grid">
-          <label>実施日<input id="pDate" readonly></label>
-          <label>弊社入り時間<input id="pCompanyIn" readonly></label>
-          <label>幹事様入り時間<input id="pOrganizerIn" readonly></label>
-          <label>受付時間<input id="pReception" readonly></label>
-          <label>開始時間<input id="pStart" readonly></label>
-          <label>終了時間<input id="pEnd" readonly></label>
-          <label>撤収時間<input id="pTeardown" readonly></label>
-          <label>フロア<input id="pFloor" readonly></label>
+          <label>実施日<input id="pDate" readonly=""></label>
+          <label>弊社入り時間<input id="pCompanyIn" readonly=""></label>
+          <label>幹事様入り時間<input id="pOrganizerIn" readonly=""></label>
+          <label>受付時間<input id="pReception" readonly=""></label>
+          <label>開始時間<input id="pStart" readonly=""></label>
+          <label>終了時間<input id="pEnd" readonly=""></label>
+          <label>撤収時間<input id="pTeardown" readonly=""></label>
+          <label>フロア<input id="pFloor" readonly=""></label>
         </div>
-        <button id="saveReservation" class="admin-primary" disabled>この内容で予約登録</button>
+        <button id="saveReservation" class="admin-primary" disabled="">この内容で予約登録</button>
         <div id="saveMsg" class="admin-msg"></div>
       </section>
     </div>
@@ -1386,22 +1402,39 @@ function refreshTimeOptions(){
   let first=document.createElement("option");first.value="";first.textContent="幹事入り時間を選択";time.appendChild(first);
   timeDropdownList.innerHTML="";
   const rows=[];
-  // スタッフ用版：○/×/A決/仮/店決/店仮などの予約状況マークは表示しない（最低保証料金のみ表示）。
   TIMES.forEach(t=>{
     let o=document.createElement("option");o.value=t;
+    const info=timeSlotBlockInfo(selected,selectedFloor,t);
+    let mark,cls;
+    if(info.kind==="internal"){
+      mark="A決";cls="time-booked";
+    }else if(info.kind==="outOfRange"){
+      mark="×";cls="time-out-of-range";
+    }else if(info.kind==="csvConfirmed"){
+      mark=csvStatusLabel(info.csvStatus);cls="time-csv-confirmed";
+    }else if(info.kind==="csvTentative"){
+      mark=csvStatusLabel(info.csvStatus);cls="time-csv-tentative";
+    }else{
+      const ok=calc(selected,selectedFloor,t).ok;
+      mark=ok?"○":"";cls=ok?"time-available":"time-unavailable";
+    }
+    // 開発確認用：その時間に実際に適用される最低保証料金（一般宴会）を常に計算して小さく表示する。
+    // ○/×/A決/仮などの表示マークとは独立に、料金ルールがその時刻で正しく切り替わっているかを
+    // 一目で確認できるようにするためのもの（2026-10-18追加）。
     const priceR=calc(selected,selectedFloor,t);
     const priceText=priceR.label||(priceR.fee!=null?yen(priceR.fee):"—");
-    o.textContent=t;o.className="";
+    o.textContent=mark?`${t}　${mark}`:t;o.className=cls;
     time.appendChild(o);
-    rows.push({t,priceText});
+    rows.push({t,mark,cls,title:info.kind==="outOfRange"?"この会場の対応時間外です":"",priceText});
   });
   if(TIMES.includes(current))time.value=current;
-  rows.forEach(({t,priceText})=>{
+  rows.forEach(({t,mark,cls,title,priceText})=>{
     const row=document.createElement("div");
-    row.className="time-opt"+(t===time.value?" selected":"");
+    row.className="time-opt "+cls+(t===time.value?" selected":"");
     row.setAttribute("role","option");
     row.dataset.value=t;
-    row.innerHTML=`<span class="time-opt-time">${t}</span><span class="time-opt-price">${esc(priceText)}</span>`;
+    if(title)row.title=title;
+    row.innerHTML=`<span class="time-opt-time">${t}</span><span class="time-opt-price">${esc(priceText)}</span><span class="time-opt-mark">${esc(mark)}</span>`;
     row.onclick=()=>{time.value=t;time.dispatchEvent(new Event("change"));closeTimeDropdown()};
     timeDropdownList.appendChild(row);
   });
@@ -1457,11 +1490,19 @@ function renderAds(){
 }
 function detail(){
   refreshTimeOptions();
-  // スタッフ用版：予約状況（社内予約・CSV予約状況・予約可能時間）による予約可否の判定・表示は行わず、
-  // 料金ルール上の金額（最低保証料金）のみを表示する。
+  // V92修正: ここで社内予約（isBooked）しか見ていなかったため、CSV予約済み・対応時間外の時間を
+  // 選んでも料金ルール通り「予約可」と表示されてしまっていた。ドロップダウンと同じtimeSlotBlockInfo
+  // を使い、社内予約・CSV予約状況・予約可能時間のどれが原因でも正しく「予約不可」側の表示にする。
+  const info=time.value?timeSlotBlockInfo(selected,selectedFloor,time.value):{blocked:false};
   const r=calc(selected,selectedFloor,time.value);
   dt.textContent=`${selected.getFullYear()}年${selected.getMonth()+1}月${selected.getDate()}日（${"日月火水木金土"[selected.getDay()]}）の料金`;ds.textContent=`${selected.getFullYear()}年${selected.getMonth()+1}月${selected.getDate()}日（${"日月火水木金土"[selected.getDay()]}）`;type.textContent=dayType(selected);type.style.color=(isHoliday(selected)||selected.getDay()===0)?"#dc2626":selected.getDay()===6?"#2563eb":"#18212f";floor.textContent=selectedFloor;
-  general.textContent=r.label||yen(r.fee);wedding.textContent=r.wlabel||r.label||yen(r.fee);note.textContent=r.note||"";
+  if(info.blocked){
+    general.textContent="—";wedding.textContent="—";status.className="status ng";status.style.display="";
+    if(info.kind==="internal"){status.textContent="予約済み";note.textContent="この時間帯はすでに予約が入っています。"}
+    else if(info.kind==="outOfRange"){status.textContent="対応時間外";note.textContent="この会場の対応時間外です。"}
+    else if(info.kind==="csvConfirmed"){status.textContent="予約済み（"+csvStatusLabel(info.csvStatus)+"）";note.textContent="CSV取込データ上、この時間帯はすでに予約が入っています。"}
+    else{status.textContent="仮予約あり（"+csvStatusLabel(info.csvStatus)+"）";note.textContent="CSV取込データ上、この時間帯は仮予約が入っています。"}
+  }else{general.textContent=r.label||yen(r.fee);wedding.textContent=r.wlabel||r.label||yen(r.fee);status.textContent=r.status+(r.condition?`（${r.condition}）`:"");status.className="status "+(r.ok?"ok":"ng");status.style.display=r.status?"":"none";note.textContent=r.note||""}
   const opt=currentVenue?.options?.[selectedFloor]||{equipment:"",venue:"",facility:"",store:"",note:""};
   const ov=s=>s?s:"—";
   equipment.textContent=ov(opt.equipment);venueFee.textContent=ov(opt.venue);facilityFee.textContent=ov(opt.facility);storeFee.textContent=ov(opt.store);optionNote.textContent=opt.note||"";optionNote.style.display=opt.note?"block":"none";
@@ -1869,20 +1910,62 @@ btnDownloadOptionCsvMismatch.onclick=()=>{
 };
 if(VENUES.length)setVenue(VENUES[0]);
 render();detail();
-</script>
-<script id="autoupdate-script">
-/* 自動更新: 公開URLのhtmlが差し替わったら自動で読み直す（http/httpsで開いている時のみ） */
+</script><script id="autoupdate-script">
+/* 自動更新: 公開URLのhtmlが差し替わったら自動で読み直す（http/httpsで開いている時のみ）。
+   読み直し前に「開いていた会場・フロア・日付・時間・スクロール位置」を保存し、読み直し後に復元する。 */
 (function(){
   if(!/^https?:$/.test(location.protocol))return;
   const URL0=location.href.split("#")[0];
+  const SK="emopare_autoupdate_state_v1";
   const sig=r=>[r.headers.get("etag"),r.headers.get("last-modified"),r.headers.get("content-length")].join("|");
   let base=null,pending=false,lastAct=Date.now(),busy=false;
   ["pointerdown","keydown","wheel","touchstart"].forEach(ev=>addEventListener(ev,()=>{lastAct=Date.now()},{passive:true}));
+
+  function saveState(){
+    try{
+      const onVenue=venuePage.style.display==="block";
+      const st={t:Date.now(),onVenue:onVenue,top:topVenueSearch.value,y:window.scrollY};
+      if(onVenue&&currentVenue){
+        st.venue=currentVenue.name;st.floor=selectedFloor;
+        st.sel=[selected.getFullYear(),selected.getMonth(),selected.getDate()];
+        st.view=[view.getFullYear(),view.getMonth()];
+        st.time=time.value;
+      }
+      sessionStorage.setItem(SK,JSON.stringify(st));
+    }catch(e){}
+  }
+  function restoreState(){
+    let st=null;
+    try{st=JSON.parse(sessionStorage.getItem(SK)||"null");sessionStorage.removeItem(SK)}catch(e){}
+    if(!st||Date.now()-st.t>120000)return;
+    try{
+      if(st.onVenue&&st.venue){
+        const v=VENUES.find(x=>x.name===st.venue);
+        if(v){
+          currentVenue=v;
+          setVenue(v);
+          topPage.style.display="none";venuePage.style.display="block";
+          if(st.floor&&v.floors.includes(st.floor))selectedFloor=st.floor;
+          renderFloorTabs();
+          selected=new Date(st.sel[0],st.sel[1],st.sel[2]);
+          view=new Date(st.view[0],st.view[1],1);
+          render();detail();
+          if(st.time){time.value=st.time;if(time.value===st.time)time.dispatchEvent(new Event("change"))}
+        }
+      }else if(st.top){
+        topVenueSearch.value=st.top;renderVenueResults(st.top);
+      }
+      window.scrollTo(0,st.y||0);
+    }catch(e){console.error("状態の復元に失敗:",e)}
+  }
+  restoreState();
+
   async function head(){
     const r=await fetch(URL0,{method:"HEAD",cache:"no-store"});
     return r.ok?sig(r):null;
   }
   async function reloadNow(){
+    saveState();
     try{await fetch(URL0,{cache:"reload"})}catch(e){}
     location.reload();
   }
@@ -1907,4 +1990,5 @@ render();detail();
   setInterval(check,10*60*1000);
   setInterval(tryReload,15*1000);
 })();
-</script></body></html>
+</script>
+</body></html>
